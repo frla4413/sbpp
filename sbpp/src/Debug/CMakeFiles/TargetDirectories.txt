@@ -1,0 +1,6 @@
+/home/fredrik/work/cpp_projects/sbpp/sbpp/src/Debug/CMakeFiles/test.dir
+/home/fredrik/work/cpp_projects/sbpp/sbpp/src/Debug/CMakeFiles/edit_cache.dir
+/home/fredrik/work/cpp_projects/sbpp/sbpp/src/Debug/CMakeFiles/rebuild_cache.dir
+/home/fredrik/work/cpp_projects/sbpp/sbpp/src/Debug/sbpp/CMakeFiles/sbpp.dir
+/home/fredrik/work/cpp_projects/sbpp/sbpp/src/Debug/sbpp/CMakeFiles/edit_cache.dir
+/home/fredrik/work/cpp_projects/sbpp/sbpp/src/Debug/sbpp/CMakeFiles/rebuild_cache.dir

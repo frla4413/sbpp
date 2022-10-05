@@ -1,0 +1,9 @@
+#include "ins.h"
+#include "integrate_ins.h"
+
+ANVÄND cshift för valarray för derivata!!
+ Inför struct BdSlice { slice, idx}
+ och ändra GetBoundarySliceAndSize till GetBdSlice
+ Gör så att array kan initieras med Shape, alltså 
+ Array(Shape)
+

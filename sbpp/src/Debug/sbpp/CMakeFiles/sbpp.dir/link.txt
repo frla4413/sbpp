@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsbpp.a CMakeFiles/sbpp.dir/src/array.cpp.o
+/usr/bin/ranlib libsbpp.a
