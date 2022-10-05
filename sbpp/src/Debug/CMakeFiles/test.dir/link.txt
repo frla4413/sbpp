@@ -1,1 +1,0 @@
-/usr/bin/c++ -g CMakeFiles/test.dir/main.cpp.o -o test  -Wl,-rpath,/opt/intel/mkl/lib/intel64 sbpp/libsbpp.a -Wl,--start-group /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.so /opt/intel/mkl/lib/intel64/libmkl_gnu_thread.so /opt/intel/mkl/lib/intel64/libmkl_core.so -fopenmp /usr/lib/libpthread.a -lm /usr/lib/libdl.a -Wl,--end-group -lgomp -lpthread -lm -ldl 
