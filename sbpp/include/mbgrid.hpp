@@ -103,6 +103,11 @@
 #include "mbarray.hpp"
 #include "mesh.hpp"
 
+struct BdSlice {
+  int block_idx;
+  std::slice slice;
+};
+
 struct Corner {
    double x, y;
    double Size() const { return x*x + y*y; };
@@ -132,7 +137,8 @@ struct Interface {
 };
 
 /*
- * True if intf1 and inft2 hold the same information.
+ * True if intf1 and inft2 hold the same information,
+ * not necessarily in the same order.
  */
 bool Equal(const Interface& lhs, const Interface& rhs);
 
@@ -268,6 +274,10 @@ class MbGrid {
 
 };
 
-void ExportToTec(const MbGrid& grid, const MbArray& vec,
+/*
+ * Export the grid and array to name.tec.
+ * Can be used in paraview to view the solution.
+ */
+void ExportToTec(const MbGrid& grid, const MbArray& array,
                  const std::string name);
 

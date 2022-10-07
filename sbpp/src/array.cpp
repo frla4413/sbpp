@@ -11,6 +11,10 @@
 //alias to improve readability
 using valarray = std::valarray<double>;
 
+bool Shape::operator !=(const Shape& other) const {
+  return Nx != other.Nx && Ny != other.Ny;
+}
+
 void Print(Shape shape) {
   std::cout << "(" << shape.Nx << "," << shape.Ny << ")";
 }

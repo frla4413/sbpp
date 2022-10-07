@@ -40,7 +40,7 @@ bool RunMbSbpTestIntegration() {
     for(int i = 0; i < N_arr.size(); ++i)
        err_arr[i] = MbSbpTestIntegration(N_arr[i], order);
     rates = GetConvergenceRates(N_arr, err_arr);
-    PrintConvergence(N_arr, err_arr);
+//    PrintConvergence(N_arr, err_arr);
     err_arr.resize(N_arr.size());
   }
   double final_rate = std::abs(rates[rates.size()-1] - 4);
@@ -108,14 +108,14 @@ bool RunMbSbpTestDifferentiaion() {
     final_rate = std::max(final_rate,
                  std::abs(rates[rates.size()-1] -
                           theoretical_rates[idx]));
-    PrintConvergence(N_arr, err_arr);
+ //   PrintConvergence(N_arr, err_arr);
 
     err_arr.resize(N_arr.size());
     std::cout << "Test y-derivative:" << std::endl;
     for(int i = 0; i < N_arr.size(); i++)
       err_arr[i] = MbSbpTestDifferentiation(N_arr[i], order,"Y");
     rates = GetConvergenceRates(N_arr, err_arr);
-    PrintConvergence(N_arr, err_arr);
+  //  PrintConvergence(N_arr, err_arr);
     err_arr.resize(N_arr.size());
     final_rate = std::max(final_rate,
                  std::abs(rates[rates.size()-1] -

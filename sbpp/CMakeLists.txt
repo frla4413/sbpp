@@ -13,11 +13,10 @@ add_library(sbpp STATIC src/array.cpp
                         src/sbp42.cpp
                         src/mbgrid.cpp
                         src/mbsbp.cpp
-                        src/basics.cpp)
-                      #  src/interpolation.cpp
-                      #  src/interpolation21.cpp
-                      #  src/interpolation42.cpp
-                      #  src/multiblocksbp.cpp
+                        src/basics.cpp
+                        src/interp.cpp
+                        src/interp21.cpp
+                        src/interp42.cpp)
                       #  src/integrate.cpp)
 
 

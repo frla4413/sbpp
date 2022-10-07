@@ -7,7 +7,6 @@
 
 #include "mbsbp.hpp"
 
-
 MbSbp::MbSbp(const std::vector<Block>& blocks, int order) :
   grid_(MbGrid(blocks)), order_ (order) {
 
@@ -41,8 +40,6 @@ MbSbp::MbSbp(const std::vector<Block>& blocks, int order) :
   }
 //  SetInterpolationOperators();
 }
-
-
 
 int MbSbp::num_blocks() {
   return grid_.num_blocks();
@@ -94,7 +91,6 @@ MbArray MbSbp::Dx(const MbArray& f) {
    }
    return {df_dx};
 }
-
 
 MbArray MbSbp::Dy(const MbArray& f) {
 

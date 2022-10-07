@@ -45,10 +45,7 @@
 
 struct Shape {
   int Nx, Ny;
-
-  bool operator !=(const Shape& other) const {
-    return Nx != other.Nx && Ny != other.Ny;
-  }
+  bool operator !=(const Shape& other) const;
 };
 
 void Print(Shape shape);

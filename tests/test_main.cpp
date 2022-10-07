@@ -2,6 +2,7 @@
 #include "sbp_tests.hpp"
 #include "mb_grid_tests.hpp"
 #include "mbsbp_tests.hpp"
+#include "interp_tests.hpp"
 
 /*
  * A set of unit tests that always should hold.
@@ -23,7 +24,6 @@ TEST(MbGridTest, BasicAssertions) {
 }
 
 /*
- *
  * Test integration on annulus (consisting of four sub-grids)
  * Expect:
  *    o Sbp21: 2
@@ -36,4 +36,18 @@ TEST(MbGridTest, BasicAssertions) {
 TEST(MbSbpTest, BasicAssertions) {
   EXPECT_EQ(RunMbSbpTestIntegration(),1);
   EXPECT_EQ(RunMbSbpTestDifferentiaion(),1);
+}
+
+/*
+ *
+ * Test interpolation operators
+ * interp21 is exact for 1st degree polynomial.
+ * interp42 is exact for 2nd degree polynomial.
+ */
+
+TEST(InterpTest, BasicAssertions) {
+  int Nc = 11, Nf = 21;
+  std::vector<int> orders{2,4};
+  for (auto& order : orders)
+    EXPECT_EQ(TestInterpolation(11, 21, order),1);
 }
