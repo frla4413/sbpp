@@ -2,9 +2,7 @@
 #include "mesh.hpp"
 #include "basics.hpp"
 
-/*
- * Integrate f(x,y) = exp(-x^2 - y^2)
- * on the annulus with r0/r1 as its inner/outer radius.
+/* * Integrate f(x,y) = exp(-x^2 - y^2) * on the annulus with r0/r1 as its inner/outer radius.
  * The analytic value is F = pi*(exp(-r0^2) - exp(-r1^2)).
  */
 double MbSbpTestIntegration(int N, int order) {
@@ -123,4 +121,53 @@ bool RunMbSbpTestDifferentiaion() {
     ++idx;
   }
   return  final_rate < 0.2;;
+}
+
+bool MbSbpTestSbpProperty(int N, int order) {
+  auto UFunc = [](double x, double y) {
+    return exp(-x*y);
+  };
+  auto VFunc = [](double x, double y) { 
+    return cos(2*M_PI*x)*sin(2*M_PI*y);
+  };
+
+  std::vector<Block> blocks = Annulus(N, 0.1, 1.0);
+
+  MbSbp sbp = MbSbp(blocks, order);
+
+  MbArray u = sbp.Evaluate(UFunc);
+  MbArray v = sbp.Evaluate(VFunc);
+
+  for(int i = 0; i < blocks.size(); ++i) {
+    u += i;
+    v += i;
+  }
+
+  MbArray dudx = sbp.DxAndInterface(u);
+  MbArray dvdx = sbp.DxAndInterface(v);
+
+  MbArray dudy = sbp.DyAndInterface(u);
+  MbArray dvdy = sbp.DyAndInterface(v);
+
+  double sbp_error = std::abs(sbp.Integrate(v*dudx) +
+                              sbp.Integrate(dvdx*u) +
+                              sbp.Integrate(v*dudy) +
+                              sbp.Integrate(dvdy*u));
+
+  auto boundaries = sbp.boundaries();
+
+  Array u_bd, v_bd, bd_quad;
+  ArrayPair normals;
+  for(auto& boundary : boundaries) {
+    u_bd = sbp.ToBlockBoundary(u, boundary.block_idx,
+                               boundary.side);
+    v_bd = sbp.ToBlockBoundary(v, boundary.block_idx,
+                               boundary.side);
+    bd_quad = sbp.GetBoundaryQuadrature(boundary.block_idx,
+                                        boundary.side);
+    normals = sbp.GetNormals(boundary.block_idx, boundary.side);
+    sbp_error -= Sum(bd_quad*v_bd*
+                    (normals.a1 + normals.a2)*u_bd);
+  }
+  return std::abs(sbp_error) < 1e-12;
 }

@@ -70,6 +70,10 @@ class MbArray {
     Array operator[] (const MbSlice slice) const;
     const Array& operator[] (int idx) const;
     Array& operator[] (int idx);
+
+    MbArray& operator+= (double a);
+    MbArray& operator-= (double a);
+
     friend MbArray operator+ (const MbArray& x, const MbArray& y);
     friend MbArray operator- (const MbArray& x, const MbArray& y);
     friend MbArray operator* (const MbArray& x, const MbArray& y);

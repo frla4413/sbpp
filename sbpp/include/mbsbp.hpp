@@ -13,7 +13,7 @@
  * and forms a MultiblockGrid.
  * The class also creates an Sbp-object on each Block
  * in the MbGrid. Interfaces are handled automatically during
- * the differentiation (Dx, Dy).
+ * differentiation (Dx, Dy).
  *
  * Member functions:
  *  o
@@ -45,9 +45,9 @@
 #include "sbp.hpp"
 #include "sbp21.hpp"
 #include "sbp42.hpp"
-//#include "interpolation.hpp"
-//#include "interpolation21.hpp"
-//#include "interpolation42.hpp"
+#include "interp.hpp"
+#include "interp21.hpp"
+#include "interp42.hpp"
 
 // This is used in InterfaceTreatment
 enum class Direction {x, y};
@@ -59,9 +59,6 @@ class MbSbp {
     //MbSbp(){};
 
     ArrayPair GetNormals(int block_idx, Side side);
-
-    void InterfaceTreatment(const MbArray& f,MbArray& df,
-                            Direction direction);
 
     MbArray Dx(const MbArray& f);
     MbArray Dy(const MbArray& f);
@@ -115,12 +112,14 @@ class MbSbp {
     // ------------------- functions ---------------------------
     void SetNormalsAndBoundaryQuadratures(int block_idx);
     void SetInterpolationOperators();
+    void InterfaceTreatment(const MbArray& f, MbArray& df,
+                            const Direction& direction);
 
     // ------------------- variables ---------------------------
     MbGrid grid_;
     int order_ = 0;
     std::vector<std::unique_ptr<Sbp>> sbp_;
-//    std::vector<std::unique_ptr<Interpolation>> interp_;
+    std::vector<std::unique_ptr<Interp>> interp_;
 
     // metric terms
     std::vector<Array> x_xi_;

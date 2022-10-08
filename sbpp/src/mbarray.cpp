@@ -137,6 +137,19 @@ MbArray VectorOperation(const MbArray& x, const MbArray& y,
   return {x.shapes(), z};
 }
 
+// ----------------- operator functions -------------------------
+MbArray& MbArray::operator+=(double a) {
+  for(auto & array : this->arrays_)
+    array+=a;
+  return *this;
+}
+
+MbArray& MbArray::operator-=(double a) {
+  for(auto & array : this->arrays_)
+    array-=a;
+  return *this;
+}
+
 MbArray operator+ (const MbArray& x, const MbArray& y) {
   return VectorOperation(x,y,Operation::add);
 }

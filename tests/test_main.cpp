@@ -36,15 +36,15 @@ TEST(MbGridTest, BasicAssertions) {
 TEST(MbSbpTest, BasicAssertions) {
   EXPECT_EQ(RunMbSbpTestIntegration(),1);
   EXPECT_EQ(RunMbSbpTestDifferentiaion(),1);
+  EXPECT_EQ(MbSbpTestSbpProperty(41, 2), 1);
 }
 
 /*
  *
  * Test interpolation operators
- * interp21 is exact for 1st degree polynomial.
- * interp42 is exact for 2nd degree polynomial.
+ * interp21 is exact for 0th degree polynomial.
+ * interp42 is exact for 1st degree polynomial.
  */
-
 TEST(InterpTest, BasicAssertions) {
   int Nc = 11, Nf = 21;
   std::vector<int> orders{2,4};
