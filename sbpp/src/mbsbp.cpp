@@ -371,19 +371,17 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
                                      MbArray& df,
                                const Direction& direction) {
 
-  int block_idx1, block_idx2, N1, N2;
   ArrayPair normals1, normals2;
-  Side side1, side2;
   Array Pinv1, Pinv2, Pgamma1, Pgamma2, f1, f2,
         interface1, interface2, n1, n2;
 
   int idx = 0; //interface index
 
   for(auto& interface : grid_.interfaces()) {
-    block_idx1 = interface.block_idx1;
-    block_idx2 = interface.block_idx2;
-    side1 = interface.side1;
-    side2 = interface.side2;
+    int block_idx1 = interface.block_idx1;
+    int block_idx2 = interface.block_idx2;
+    Side side1 = interface.side1;
+    Side side2 = interface.side2;
 
     auto size_and_slice1 = grid_.GetBlockBoundarySliceAndSize(
                                         block_idx1,side1);
@@ -393,8 +391,8 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
     Pinv2 = GetPinvAtBoundary(block_idx2, side2);
     Pgamma1 = GetBoundaryQuadrature(block_idx1, side1);
     Pgamma2 = GetBoundaryQuadrature(block_idx2, side2);
-    N1 = Pinv1.size();
-    N2 = Pinv2.size();
+    int N1 = Pinv1.size();
+    int N2 = Pinv2.size();
 
     f1 = ToBlockBoundary(f, block_idx1, side1);
     f2 = ToBlockBoundary(f, block_idx2, side2);
@@ -418,6 +416,8 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
 //                  0.5*(n1*interp_[idx]->Interpolate(f2) -
 //                       interp_[idx]->Interpolate(n2*f2)));
 
+    df[block_idx1][size_and_slice1.second] += interface1.array();
+
     if(grid_.IsFilppedInterface(idx)) {
       f2.Reverse();
       f1.Reverse();
@@ -428,7 +428,6 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
     //              0.5*(n2*interp_[idx]->Interpolate(f1) -
     //                   interp_[idx]->Interpolate(n1*f1)));
 
-    df[block_idx1][size_and_slice1.second] += interface1.array();
     df[block_idx2][size_and_slice2.second] += interface2.array();
     ++idx;
   }
@@ -436,7 +435,7 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
 
 MbArray MbSbp::DxAndInterface(const MbArray& f) {
   MbArray dfdx = Dx(f);
-  InterfaceTreatment(f, dfdx, Direction::y);
+  InterfaceTreatment(f, dfdx, Direction::x);
   return dfdx;
 }
 

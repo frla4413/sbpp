@@ -7,7 +7,7 @@
 
 #include "advection.hpp"
 
-Advection::Advection(std::vector<Block> blocks, int order,
+Advection::Advection(const std::vector<Block>& blocks, int order,
                      std::pair<double,double> a) {
   sbp_ = std::make_unique<MbSbp>(blocks, order);
   a_   = a;

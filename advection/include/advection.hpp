@@ -20,9 +20,7 @@
 
 class Advection {
   public:
-   Advection(MbSbp* sbp, std::pair<double,double> a);
-
-   Advection(std::vector<Block> blocks, int order,
+   Advection(const std::vector<Block>& blocks, int order,
              std::pair<double,double> a);
    MbArray AnalyticVec(double t);
 
