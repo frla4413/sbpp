@@ -56,7 +56,6 @@ class MbSbp {
   public:
     MbSbp(const std::vector<Block>& blocks, int order);
     ~MbSbp(){};
-    //MbSbp(){};
 
     ArrayPair GetNormals(int block_idx, Side side);
 
@@ -66,7 +65,7 @@ class MbSbp {
     MbArray DxAndInterface(const MbArray& f);
     MbArray DyAndInterface(const MbArray& f);
 
-    double Integrate(const MbArray&f);
+    double Integrate(const MbArray& f);
 
     Array GetBoundaryQuadrature(int block_idx, Side side);
     Array GetPinvAtBoundary(int block_idx, Side side);

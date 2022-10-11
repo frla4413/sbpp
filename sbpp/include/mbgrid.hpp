@@ -176,7 +176,7 @@ class MbGrid {
   using Corners = std::vector<Corner>;
 
   public:
-    MbGrid(const Blocks blocks);
+    MbGrid(const Blocks& blocks);
 
     Blocks& blocks();
     const Blocks& blocks() const;

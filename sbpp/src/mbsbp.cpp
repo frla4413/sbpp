@@ -12,7 +12,7 @@ MbSbp::MbSbp(const std::vector<Block>& blocks, int order) :
 
   int block_idx = 0, idx = 0;
 
-  for (auto& block : blocks) {
+  for (auto& block : grid_.blocks()) {
     Shape shape = grid_.shapes(block_idx);
     int Nx = shape.Nx;
     int Ny = shape.Ny;
@@ -413,20 +413,20 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
     if(grid_.IsFilppedInterface(idx))
       f2.Reverse();
 
-    //interface1 = -0.5*Pinv1*Pgamma1*(n1*f1 - 0.5*(n1 - n2)*f2);
-    interface1 = -0.5*Pinv1*Pgamma1*(n1*f1 -
-                  0.5*(n1*interp_[idx]->Interpolate(f2) -
-                       interp_[idx]->Interpolate(n2*f2)));
+    interface1 = -0.5*Pinv1*Pgamma1*(n1*f1 - 0.5*(n1 - n2)*f2);
+//    interface1 = -0.5*Pinv1*Pgamma1*(n1*f1 -
+//                  0.5*(n1*interp_[idx]->Interpolate(f2) -
+//                       interp_[idx]->Interpolate(n2*f2)));
 
     if(grid_.IsFilppedInterface(idx)) {
       f2.Reverse();
       f1.Reverse();
     }
 
-    //interface2 = -0.5*Pinv2*Pgamma2*(1.0*n2*f2 - 0.5*(n2 - n1)*f1);
-    interface2 = -0.5*Pinv2*Pgamma2*(n2*f2 - 
-                  0.5*(n2*interp_[idx]->Interpolate(f1) -
-                       interp_[idx]->Interpolate(n1*f1)));
+    interface2 = -0.5*Pinv2*Pgamma2*(1.0*n2*f2 - 0.5*(n2 - n1)*f1);
+    //interface2 = -0.5*Pinv2*Pgamma2*(n2*f2 - 
+    //              0.5*(n2*interp_[idx]->Interpolate(f1) -
+    //                   interp_[idx]->Interpolate(n1*f1)));
 
     df[block_idx1][size_and_slice1.second] += interface1.array();
     df[block_idx2][size_and_slice2.second] += interface2.array();

@@ -267,7 +267,7 @@ double Min(const MbArray mb_array) {
   return min;
 }
 
-double Max(const MbArray mb_array) {
+double Max(const MbArray& mb_array) {
 
   auto max = mb_array[0][0];
 
@@ -279,7 +279,7 @@ double Max(const MbArray mb_array) {
   return max;
 }
 
-double Sum(const MbArray mb_array) {
+double Sum(const MbArray& mb_array) {
 
   auto sum = 0.0;
 
@@ -287,4 +287,13 @@ double Sum(const MbArray mb_array) {
     sum += Sum(array);
   }
   return sum;
+}
+
+MbArray Abs(const MbArray& mb_array) {
+
+  Arrays abs_array(mb_array.Size());
+
+  for(int i = 0; i < mb_array.Size(); ++i)
+    abs_array[i] = Abs(mb_array[i]);
+  return {mb_array.shapes(), abs_array};
 }

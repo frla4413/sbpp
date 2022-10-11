@@ -16,8 +16,8 @@ add_library(sbpp STATIC src/array.cpp
                         src/basics.cpp
                         src/interp.cpp
                         src/interp21.cpp
-                        src/interp42.cpp)
-                      #  src/integrate.cpp)
+                        src/interp42.cpp
+                        src/integrate.cpp)
 
 
 find_package(MKL REQUIRED)

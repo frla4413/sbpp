@@ -30,6 +30,7 @@
  *  o Sum(MbArray)
  *  o Min(MbArray)
  *  o Max(MbArray)
+ *  o Abs(MbArray)
  */
 
 #pragma once
@@ -113,3 +114,9 @@ void Print(const MbArray& mb_array);
 double Max(const MbArray& mb_array);
 double Min(const MbArray& mb_array);
 double Sum(const MbArray& mb_array);
+
+
+/*
+ * Return element-wise abs of mb_array.
+ */
+MbArray Abs(const MbArray& mb_array);

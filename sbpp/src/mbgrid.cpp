@@ -111,7 +111,7 @@ bool Equal(const Interface& lhs, const Interface& rhs) {
   return (same_blocks && same_sides);
 }
 
-MbGrid::MbGrid(const Blocks blocks) {
+MbGrid::MbGrid(const Blocks& blocks) {
 
   for(auto& block : blocks) {
     if(GetShape(block.x) != GetShape(block.y))
@@ -224,18 +224,16 @@ Array MbGrid::ToBlockBoundary(const MbArray& f,
 MbArray MbGrid::Evaluate(std::function<double(double,double)> f) {
 
   std::vector<Array> z;
-  Array zi;
-  Shape shape;
   int block_idx = 0;
 
   for(auto& block : blocks_) {
-    shape = shapes(block_idx);
-    zi = Array(shape.Nx, shape.Ny);
+    Shape shape = shapes(block_idx);
+    Array zi = Array(shape.Nx, shape.Ny);
 
-    for(int j = 0; j < block.x.size(); j++)
+    for(int j = 0; j < block.x.size(); ++j)
        zi[j] = f(block.x[j], block.y[j]);
     z.push_back(zi);
-    block_idx += 1;
+    ++block_idx;
   }
   return MbArray(z);
 }
