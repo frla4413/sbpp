@@ -13,17 +13,45 @@ struct Solution {
 // --------------------------------------------------------------
 // ----------------- Explicit time integration ------------------
 // --------------------------------------------------------------
+
+/*
+ * Explicit integration.
+ * Optional to save every XX solution step
+ * so that 15 snapshots are saved per time unit.
+ *
+ * Integrates y' + odefun(t,y) = 0 from tspan[0] to tspan[1].
+ * Input:
+ *   o tspan[t0, t1] - limits of the integration
+ *   o y0 - initial condition
+ *   o dt - step size
+ *   o odefun - std::function so that
+ *              MbArray y' = - odefun(double t, MbArray y)
+ *   o write_to_file - true/false
+ *
+ *   o export_to_tec - std::function to write y to .tec format.
+ *                  void export_to_tec(MbArray y, std::string name)
+ *
+ *   o std::string name_base - name_base of the files to be saved.
+ *                     Each saved file will get an index extension.
+ *                     Ex: name_base = "save/sol"
+ *                     Then each file will be saved as 
+ *                     "save/sol1, "save/sol2", ...
+ *
+ * Output:
+ *   o Solution containing the approximation to y(t1) and t1.
+ */
+
 Solution ExplicitIntegration(std::vector<double>& tspan,
                              const MbArray& y0, double dt,
-      std::function<MbArray(double t, const MbArray&)> odefun);
+      std::function<MbArray(double t, const MbArray&)> odefun,
+      bool write_to_file = false,
+      std::function<void(const MbArray&,const std::string&)>
+      export_to_tec = NULL,
+      std::string name_base = "none");
 
-//Solution ExplicitIntegrationSaveSolution(std::vector< double >& tspan, 
-//                                                    const MbArray& y0, 
-//                                                    double dt,
-//                 std::function<MbArray(double t, const MbArray&)> odefun,
-//        std::function<void(const MbArray&, const std::string&)> export_to_tec,
-//        std::string name_base);
-
+/*
+ * 4th order RK-step. Used in ExplicitIntegration.
+ */
 MbArray RK4Step(double t, const MbArray& y, double dt,
            std::function<MbArray(double, const MbArray&)> odefun);
 

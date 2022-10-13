@@ -149,16 +149,16 @@ double Advection::ComputeError(const double t,
  return sqrt(sbp_->Integrate(err));
 }
 
-//void Advection::ExportToTec(const MbArray& arr,
-//                            const std::string name) {
-//  ExportToTec(sbp_->grid(), arr, name);
-//}
-
-void Advection::ExportToTec(const std::vector<MbArray>& gf_vec,
-                            const std::string name_base) {
-  std::string name;
-  for (int i = 0; i < gf_vec.size(); ++i) {
-    name = name_base + std::to_string(i);
-    ::ExportToTec(sbp_->grid(), gf_vec[i], name);
-  }
+void Advection::AdvectionToTec(const MbArray& arr,
+                               const std::string name) {
+  ExportToTec(sbp_->grid(), arr, name);
 }
+
+//void Advection::AdvectionToTec(const std::vector<MbArray>& array,
+//                    const std::string name_base) {
+//  std::string name;
+//  for (int i = 0; i < array.size(); ++i) {
+//    name = name_base + std::to_string(i);
+//    ExportToTec(sbp_->grid(), array[i], name);
+//  }
+//}

@@ -7,42 +7,49 @@
 // ----------------- Explicit time integration ------------------
 // --------------------------------------------------------------
 
-/*
- * Explicit integration.
- * Integrates y' + odefun(t,y) = 0 from tspan[0] to tspan[1].
- * Input:
- *   o tspan[t0, t1] - limits of the integration
- *   o y0 - initial condition
- *   o dt - step size
- *   o odefun - std::function. 
- *              MbArray y' = odefun(double t, MbArray y)
- *
- * Output:
- *   o Solution containing the approximation to y(t1) and t1.
- */
+
 
 Solution ExplicitIntegration(std::vector<double>& tspan,
                              const MbArray& y0, double dt,
-        std::function<MbArray(double, const MbArray&)> odefun) {
+        std::function<MbArray(double, const MbArray&)> odefun,
+        bool write_to_file,
+        std::function<void(const MbArray&,const std::string&)>
+        export_to_tec,
+        std::string name_base) {
 
   int NoS  = (int) ceil((tspan[1] - tspan[0])/dt) + 1;
+
+  int steps_per_time, print_interval, tec_pos;
+  if(write_to_file) {
+    steps_per_time = static_cast<int>(
+                         ceil(NoS/(tspan[1] - tspan[0])));
+    print_interval = ceil(steps_per_time/15);
+    tec_pos = 0;
+  }
 
   MbArray y = y0;
   double t = tspan[0];
 
   for(int i : tq::trange(NoS)) {
+     if( write_to_file && i % print_interval == 0) {
+       // write to file
+       std::string file_name = name_base + std::to_string(tec_pos);
+       export_to_tec(y,file_name);
+       ++tec_pos;
+     }
+
     y = RK4Step(t, y, dt, odefun);
     t += dt;
   }
   return {t,y};
 }
 
-/* Explicit integration, save every XX solution step 
+/* Explicit integration, save every XX solution step
  * so that 15 snapshots are saved per time unit.
  *
  * Input and Output are similar to ExplicitIntegration except for
  *
- * Input: 
+ * Input:
  *   o export to tec: std::function to write y to .tec format.
  *                    void export_to_tec(MbArray y, std::string name)
  *   o std::string name_base - name_base of the files to be saved. 
@@ -51,38 +58,36 @@ Solution ExplicitIntegration(std::vector<double>& tspan,
  *                             Then each file will be saved as 
  *                             "save/sol1, "save/sol2", ...
  */
-//Solution ExplicitIntegrationSaveSolution(std::vector< double >& tspan,
-//                        const MbArray& y0, double dt,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<void(const MbArray&, const std::string&)> export_to_tec,
-//        std::string name_base)
-//{
-//     int NoS  = (int) ceil((tspan[1] - tspan[0])/dt) + 1;
-//
-//     MbArray y = y0;
-//     double t = tspan[0];
-//     int steps_per_time = static_cast<int>( ceil(NoS/(tspan[1] - tspan[0])));
-//     int interval = ceil(steps_per_time/15);
-//     int tec_pos = 0;
-//
-//     for(int i : tq::trange(NoS))
-//     {
-//        if(i % interval == 0)
-//        {
-//           std::string file_name = name_base + std::to_string(tec_pos);
-//           export_to_tec(y,file_name);
-//           tec_pos ++;
-//        }
-//
-//        y = RK4Step(t, y, dt, odefun);
-//        t += dt;
-//     }
-//     
-//     struct Solution solution;
-//     solution.sol = y;
-//     solution.time = t;
-//     return solution;
-//}
+Solution ExplicitIntegrationSaveSolution(
+    std::vector<double>& tspan, const MbArray& y0, double dt,
+        std::function<MbArray(double,const MbArray&)> odefun,
+        std::function<void(const MbArray&,const std::string&)>
+        export_to_tec,
+        std::string name_base) {
+
+  int NoS  = (int) ceil((tspan[1] - tspan[0])/dt) + 1;
+
+  MbArray y {y0};
+  double t = tspan[0];
+  int steps_per_time = static_cast<int>(
+                       ceil(NoS/(tspan[1] - tspan[0])));
+  int print_interval = ceil(steps_per_time/15);
+  int tec_pos = 0;
+
+  for(int i : tq::trange(NoS)) {
+     if(i % print_interval == 0) {
+       std::string file_name =
+         name_base + std::to_string(tec_pos);
+       export_to_tec(y,file_name);
+       ++tec_pos;
+     }
+
+     y = RK4Step(t, y, dt, odefun);
+     t += dt;
+  }
+
+  return {t,y};
+}
 
 /* Runge-Kutta 4th order step.
 * To be used in explicit time integration.

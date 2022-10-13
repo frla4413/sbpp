@@ -20,30 +20,31 @@
 
 class Advection {
   public:
-   Advection(const std::vector<Block>& blocks, int order,
-             std::pair<double,double> a);
-   MbArray AnalyticVec(double t);
+    Advection(const std::vector<Block>& blocks, int order,
+              std::pair<double,double> a);
+    MbArray AnalyticVec(double t);
 
-   MbArray Force(double t);
+    MbArray Force(double t);
 
-   MbArray Rhs(double t, const MbArray& f, bool mms);
+    MbArray Rhs(double t, const MbArray& f, bool mms);
 
-   void ApplySat(double t, const MbArray& sol,
-                 MbArray& rhs, std::function<MbArray(double t)>);
+    void ApplySat(double t, const MbArray& sol,
+                  MbArray& rhs, std::function<MbArray(double t)>);
 
-   void WriteToFile(const MbArray& sol,
-                    const std::string name_base);
+    void WriteToFile(const MbArray& sol,
+                     const std::string name_base);
 
-   void SolutionToFile(const std::vector<Array>& sol,
-                       const std::string name_base,
-                       const int stride);
+    void SolutionToFile(const std::vector<Array>& sol,
+                        const std::string name_base,
+                        const int stride);
 
-   double ComputeError(const double t, const MbArray& computed);
+    double ComputeError(const double t, const MbArray& computed);
 
-//   void ExportToTec(const MbArray& gf,const std::string name);
+//    void AdvectionToTec(const std::vector<MbArray>& array,
+//                        const std::string name_base);
 
-   void ExportToTec(const std::vector<MbArray>& gf_vec,
-                    const std::string name_base);
+
+   void AdvectionToTec(const MbArray& array,const std::string name);
 
    MbArray Jacobian(double t, const MbArray& f);
 
@@ -57,3 +58,5 @@ class Advection {
    std::unique_ptr<MbSbp> sbp_;
   // MbSbp* sbp_;
 };
+
+
