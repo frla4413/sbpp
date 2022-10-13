@@ -3,9 +3,14 @@
 // Author      : frela05
 // Description : main-file for advection equation
 //               u_t + a1 ux + a2 uy = F
-//               This test case includes a manufactured solution.
+//               This test case includes a manufactured solution,
+//               a verification process.
 //               Explicit time integration is used.
 //               The solution of the finest grid is saved to
+//               The expected order (shown in the table at the end)
+//               for "order = 2" is 2.
+//               However, the expected convergence order for
+//               "order = 4" is 3.
 //               "adv/sol".
 //               This file must be created before execution.
 //=================================================================
@@ -38,16 +43,12 @@ int main() {
   int err_vec_pos = 0;
 
   for (auto& N : N_vec) {
-    auto block{CartesianGrid(N, N)};
-    std::vector<Block> blocks {block};
-    auto block2 = CartesianGrid(N/2+1, N/2+1);
-    block2.x += 1;
-    blocks.push_back(block2);
+    auto blocks{NonConformingAnnulus(N, 0.2, 1.0)};
 
     Advection advec{blocks, order, a};
     MbArray initial{advec.AnalyticVec(0.0)};
 
-    double dt = 0.5/N;
+    double dt = 0.1/N;
 
     auto rhs_fun = [&] (double t, const MbArray& y) {
       bool mms;
@@ -66,8 +67,7 @@ int main() {
               write_to_file, AdvectionToTec, name_base);
     }
 
-    sol = {ExplicitIntegration(tspan, initial, dt, rhs_fun)};
-
+    sol = ExplicitIntegration(tspan, initial, dt, rhs_fun);
     err_vec[err_vec_pos] = advec.ComputeError(sol.t,sol.y);
     std::cout << "\nError: " << err_vec[err_vec_pos] << "\n";
     ++err_vec_pos;

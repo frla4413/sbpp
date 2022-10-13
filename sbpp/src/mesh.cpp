@@ -60,3 +60,15 @@ std::vector<Block> Annulus(int N, double r_in, double r_out) {
   blocks.push_back(CircleSector(N,N,r_in,r_out,1.5*M_PI,2*M_PI));
   return blocks;
 }
+
+std::vector<Block> NonConformingAnnulus(int N, double r_in,
+                                        double r_out) {
+  std::vector<Block> blocks;
+  blocks.push_back(CircleSector(N,N,r_in,r_out,0.0,0.5*M_PI));
+  blocks.push_back(CircleSector(N/2+1,N/2+1,r_in,r_out,
+                                0.5*M_PI, M_PI));
+  blocks.push_back(CircleSector(N/2+1,N/2+1,r_in,
+                                r_out,M_PI,1.5*M_PI));
+  blocks.push_back(CircleSector(N,N,r_in,r_out,1.5*M_PI,2*M_PI));
+  return blocks;
+}

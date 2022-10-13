@@ -40,3 +40,5 @@ Block CircleSector(int Nr, int Nth, double r_in, double r_out,
 
 //Multiblock meshes
 std::vector<Block> Annulus(int N, double r_in, double r_out);
+std::vector<Block> NonConformingAnnulus(int N, double r_in,
+                                        double r_out);
