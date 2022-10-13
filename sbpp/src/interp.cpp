@@ -7,15 +7,22 @@
 
 
 #include "interp.hpp"
+#include <string.h>
 
-Interp::Interp(int Nc, int Nf) {
+Interp::Interp(int N1, int N2) {
 
-  if (Nc != Nf &&
-     (static_cast<double>(Nf-1) / static_cast<double>(Nc-1)) !=2)
-    throw std::invalid_argument("@Interp - (Nf-1)/(Nc-1) = 2 is required!");
-
-  Nf_ = Nf;
-  Nc_ = Nc;
+  Nf_ = N1;
+  Nc_ = N2;
+  if(N1 < N2) {
+    Nc_ = N1;
+    Nf_ = N2;
+  }
+  if (Nc_ != Nf_ && ((Nf_-1) / (Nc_-1)) !=2) {
+    int quotient = (Nf_ - 1)/(Nc_-1);
+    std::string msg = "@Interp - (Nf-1)/(Nc-1) = " +
+      std::to_string(quotient) + " != 2 \n";
+    throw std::invalid_argument(msg);
+  }
 }
 
 Array Interp::Interpolate(const Array &array) {
@@ -25,6 +32,13 @@ Array Interp::Interpolate(const Array &array) {
     return Fine2Coarse(array);
   else if (array.size() == Nc_)
     return Coarse2Fine(array);
-  else
-    throw std::invalid_argument("@Interpolation - wrong size!");
+  else {
+    std::string msg = "@Interpoation - wrong size: Nf_ = "
+                      + std::to_string(Nf_) +
+                      " Nc_ " + std::to_string(Nc_)  +
+                      " array.size() = " +
+                      std::to_string(array.size());
+    //throw std::invalid_argument("@Interpolation - wrong size!");
+    throw std::invalid_argument(msg);
+  }
 }

@@ -30,18 +30,20 @@ int main() {
 
   std::pair<double,double> a{1,1};
 
-  std::valarray<int> N_vec = {21,41};
+  std::valarray<int> N_vec = {21,41,81};
 
   std::valarray<double> err_vec(N_vec.size());
-  int order = 2;
+  int order = 4;
 
   int err_vec_pos = 0;
 
   for (auto& N : N_vec) {
     auto block{CartesianGrid(N, N)};
     std::vector<Block> blocks {block};
-    block.x += 1;
-    blocks.push_back(block);
+    auto block2 = CartesianGrid(N/2+1, N/2+1);
+    block2.x += 1;
+    blocks.push_back(block2);
+
     Advection advec{blocks, order, a};
     MbArray initial{advec.AnalyticVec(0.0)};
 

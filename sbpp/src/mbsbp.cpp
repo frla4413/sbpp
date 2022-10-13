@@ -344,8 +344,9 @@ void MbSbp::SetInterpolationOperators() {
   for(auto& interface : grid_.interfaces()) {
     int N1 = GetPinvAtBoundary(interface.block_idx1,
                                interface.side1).size();
-    int N2 = GetPinvAtBoundary(interface.block_idx1,
+    int N2 = GetPinvAtBoundary(interface.block_idx2,
                                interface.side2).size();
+
     switch (order_) {
       case 4:
         interp_.push_back(std::make_unique<Interp42>(N1,N2));
@@ -372,8 +373,8 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
                                const Direction& direction) {
 
   ArrayPair normals1, normals2;
-  Array Pinv1, Pinv2, Pgamma1, Pgamma2, f1, f2,
-        interface1, interface2, n1, n2;
+  Array Pinv, Pgamma, f1, f2,
+        sat, interface2, n1, n2;
 
   int idx = 0; //interface index
 
@@ -387,12 +388,8 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
                                         block_idx1,side1);
     auto size_and_slice2 = grid_.GetBlockBoundarySliceAndSize(
                                      block_idx2,side2);
-    Pinv1 = GetPinvAtBoundary(block_idx1, side1);
-    Pinv2 = GetPinvAtBoundary(block_idx2, side2);
-    Pgamma1 = GetBoundaryQuadrature(block_idx1, side1);
-    Pgamma2 = GetBoundaryQuadrature(block_idx2, side2);
-    int N1 = Pinv1.size();
-    int N2 = Pinv2.size();
+    Pinv = GetPinvAtBoundary(block_idx1, side1);
+    Pgamma = GetBoundaryQuadrature(block_idx1, side1);
 
     f1 = ToBlockBoundary(f, block_idx1, side1);
     f2 = ToBlockBoundary(f, block_idx2, side2);
@@ -411,24 +408,24 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
     if(grid_.IsFilppedInterface(idx))
       f2.Reverse();
 
-    interface1 = -0.5*Pinv1*Pgamma1*(n1*f1 - 0.5*(n1 - n2)*f2);
-//    interface1 = -0.5*Pinv1*Pgamma1*(n1*f1 -
-//                  0.5*(n1*interp_[idx]->Interpolate(f2) -
-//                       interp_[idx]->Interpolate(n2*f2)));
+    sat = -0.5*Pinv*Pgamma*(n1*f1 -
+           0.5*(n1*interp_[idx]->Interpolate(f2) -
+                interp_[idx]->Interpolate(n2*f2)));
 
-    df[block_idx1][size_and_slice1.second] += interface1.array();
+    df[block_idx1][size_and_slice1.second] += sat.array();
 
     if(grid_.IsFilppedInterface(idx)) {
       f2.Reverse();
       f1.Reverse();
     }
 
-    interface2 = -0.5*Pinv2*Pgamma2*(1.0*n2*f2 - 0.5*(n2 - n1)*f1);
-    //interface2 = -0.5*Pinv2*Pgamma2*(n2*f2 - 
-    //              0.5*(n2*interp_[idx]->Interpolate(f1) -
-    //                   interp_[idx]->Interpolate(n1*f1)));
+    Pgamma = GetBoundaryQuadrature(block_idx2, side2);
+    Pinv = GetPinvAtBoundary(block_idx2, side2);
+    sat = -0.5*Pinv*Pgamma*(n2*f2 -
+           0.5*(n2*interp_[idx]->Interpolate(f1) -
+               interp_[idx]->Interpolate(n1*f1)));
 
-    df[block_idx2][size_and_slice2.second] += interface2.array();
+    df[block_idx2][size_and_slice2.second] += sat.array();
     ++idx;
   }
 }
