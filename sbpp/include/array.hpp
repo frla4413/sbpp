@@ -33,6 +33,7 @@
  *  o Sum(array)
  *  o Max(array)
  *  o Min(array)
+ *  o InfNorm(array)
  *  o Zeros(Nx, Ny)
  *  o Ones(Nx, Ny)
  */
@@ -141,3 +142,9 @@ double Sum(const Array& array);
  * Return element-wise abs of array.
  */
 Array Abs(const Array& array);
+
+
+/*
+ * Return max(abs(array))
+ */
+double InfNorm(const Array& array);

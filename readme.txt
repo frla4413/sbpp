@@ -27,4 +27,4 @@ Schematic overwiew of the solution process:
   iv) Integrate in time -
             sol{Integration([t0 t1], init, dt, rhs_fun)
 
-See advection/main_.cpp for more details.
+See advection/main*.cpp for more details.

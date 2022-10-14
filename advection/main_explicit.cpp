@@ -1,6 +1,6 @@
 //==================================================================
 // Name        : main_explicit.cpp
-// Author      : frela05
+// Author      : Fredrik Laurén
 // Description : main-file for advection equation
 //               u_t + a1 ux + a2 uy = F
 //               This test case includes a manufactured solution,
@@ -48,7 +48,7 @@ int main() {
     Advection advec{blocks, order, a};
     MbArray initial{advec.AnalyticVec(0.0)};
 
-    double dt = 0.1/N;
+    double dt = 0.2/N;
 
     auto rhs_fun = [&] (double t, const MbArray& y) {
       bool mms;
@@ -64,7 +64,7 @@ int main() {
         advec.AdvectionToTec(f, name);
       };
       sol = ExplicitIntegration(tspan, initial, dt, rhs_fun,
-              write_to_file, AdvectionToTec, name_base);
+            write_to_file, AdvectionToTec, name_base);
     }
 
     sol = ExplicitIntegration(tspan, initial, dt, rhs_fun);

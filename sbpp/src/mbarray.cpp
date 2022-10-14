@@ -41,6 +41,18 @@ MbArray::MbArray(const Arrays& arrays) {
   arrays_ = arrays;
 }
 
+
+MbArray::MbArray(const Shapes& shapes, const valarray& f) :
+  shapes_(shapes) {
+   int start = 0;
+   for(auto& shape : shapes_) {
+      int size = shape.Nx*shape.Ny;
+      arrays_.push_back(Array(shape.Nx,shape.Ny,
+                              f[std::slice(start,size,1)]));
+      start += size;
+   }
+}
+
 Arrays& MbArray::arrays() {
   return arrays_;
 }
@@ -63,6 +75,27 @@ const Shape& MbArray::shapes(int idx) const{
 
 int MbArray::Size() const {
   return shapes_.size();
+}
+
+int MbArray::GetTotalSize() const {
+
+  int total_size = 0;
+  for(auto& shape : shapes_)
+    total_size += shape.Nx * shape.Ny;
+  return total_size;
+}
+
+valarray MbArray::ToValarray() const {
+
+  valarray out(GetTotalSize());
+
+  int start = 0;
+  for(auto& array : arrays_) {
+    int size = array.size();
+    out[std::slice(start,size,1)] = array.array();
+    start += size;
+  }
+  return out;
 }
 
 std::vector<Array>::iterator MbArray::begin() {
@@ -147,6 +180,18 @@ MbArray& MbArray::operator+=(double a) {
 MbArray& MbArray::operator-=(double a) {
   for(auto & array : this->arrays_)
     array-=a;
+  return *this;
+}
+
+MbArray& MbArray::operator+=(const MbArray& x) {
+  for(int i = 0; i < this->arrays_.size(); ++i)
+    this->arrays_[i] += x[i];
+  return *this;
+}
+
+MbArray& MbArray::operator-=(const MbArray& x) {
+  for(int i = 0; i < this->arrays_.size(); ++i)
+    this->arrays_[i] -= x[i];
   return *this;
 }
 
@@ -279,6 +324,17 @@ double Max(const MbArray& mb_array) {
   return max;
 }
 
+double InfNorm(const MbArray& mb_array) {
+
+  auto max = mb_array[0][0];
+
+  for(auto& array : mb_array.arrays()) {
+    auto array_max = Max(Abs(array));
+    if(array_max > max)
+      max = array_max;
+  }
+  return max;
+}
 double Sum(const MbArray& mb_array) {
 
   auto sum = 0.0;

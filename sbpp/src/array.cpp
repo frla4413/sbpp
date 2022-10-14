@@ -121,6 +121,10 @@ Array Abs(const Array& array) {
   return {array.Nx(), array.Ny(), std::abs(array.array())};
 };
 
+double InfNorm(const Array& array) {
+  return (std::abs(array.array())).max();
+};
+
 // ----------------- operator functions -------------------------
 Array& Array::operator+=(const Array& x) {
   try {

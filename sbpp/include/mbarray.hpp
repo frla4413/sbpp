@@ -31,6 +31,7 @@
  *  o Min(MbArray)
  *  o Max(MbArray)
  *  o Abs(MbArray)
+ *  o InfNorm(MbArray)
  */
 
 #pragma once
@@ -47,10 +48,13 @@ class MbArray {
   //alias to improve readability
   using Shapes = std::vector<Shape>;
   using Arrays = std::vector<Array>;
+  using valarray = std::valarray<double>;
 
   public:
     MbArray(const Shapes& shapes, const Arrays& arrays);
     MbArray(const Arrays& arrays);
+
+    MbArray(const Shapes& shapes, const valarray& array);
     MbArray(){};
 
     Arrays& arrays();
@@ -60,6 +64,8 @@ class MbArray {
     const Shapes& shapes() const;
     const Shape& shapes(int idx) const;
     int Size() const;
+    int GetTotalSize() const;
+    std::valarray<double> ToValarray() const;
 
     std::vector<Array>::iterator begin();
     std::vector<Array>::iterator end();
@@ -74,6 +80,9 @@ class MbArray {
 
     MbArray& operator+= (double a);
     MbArray& operator-= (double a);
+    MbArray& operator+= (const MbArray& x);
+    MbArray& operator-= (const MbArray& x);
+
 
     friend MbArray operator+ (const MbArray& x, const MbArray& y);
     friend MbArray operator- (const MbArray& x, const MbArray& y);
@@ -120,3 +129,8 @@ double Sum(const MbArray& mb_array);
  * Return element-wise abs of mb_array.
  */
 MbArray Abs(const MbArray& mb_array);
+
+/*
+ * Return max(abs(mbarray))
+ */
+double InfNorm(const MbArray& mb_array);

@@ -121,14 +121,14 @@ void Advection::ApplySat(double t, const MbArray& sol,
 
 /*
  * Jacobian for rhs multiplied by a vector f
- *  J f  = (a1 Dxf + a2 Dy f) + SAT(f) 
- *  The SAT-term is evaluated for g = 0 (no data), 
+ *  J f  = (a1 Dxf + a2 Dy f) + SAT(f)
+ *  The SAT-term is evaluated for g = 0 (no data),
  *  since it is not included in the Jacobian
  */
 MbArray Advection::Jacobian(double t, const MbArray& f) {
-  MbArray d_f_dx = sbp_->DxAndInterface(f);
-  MbArray d_f_dy = sbp_->DyAndInterface(f);
-  MbArray rhs = -1.0*(a_.first*d_f_dx + a_.second*d_f_dy);
+  MbArray df_dx = sbp_->DxAndInterface(f);
+  MbArray df_dy = sbp_->DyAndInterface(f);
+  MbArray rhs = -1.0*(a_.first*df_dx + a_.second*df_dy);
 
   auto data_func = [tau = t](double x, double y){
     return 0;
