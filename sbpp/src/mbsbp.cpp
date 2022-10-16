@@ -131,12 +131,14 @@ ArrayPair MbSbp::GetNormals(int block_idx, Side side) {
 
 Array MbSbp::Dn(const MbArray& f, int block_idx, Side side) {
   auto normals = GetNormals(block_idx, side);
-  auto bd_slice = GetBlockBoundarySliceAndSize(block_idx, side);
+  auto bd_slice = GetBdSlice(block_idx, side);
 
-  std::valarray<double> dfdx = Dx(f, block_idx)[bd_slice.second];
-  std::valarray<double> dfdy = Dy(f, block_idx)[bd_slice.second];
+  std::valarray<double> dfdx = Dx(f, block_idx)[bd_slice.slice];
+  std::valarray<double> dfdy = Dy(f, block_idx)[bd_slice.slice];
 
-  return Array(1, bd_slice.first, normals.a1.array()*dfdx +
+  int size = bd_slice.slice.size();
+
+  return Array(1, size, normals.a1.array()*dfdx +
                                   normals.a2.array()*dfdy);
 }
 
@@ -299,10 +301,9 @@ void MbSbp::SetNormalsAndBoundaryQuadratures(int block_idx) {
       ToBlockBoundary(p_inv, block_idx,side));
 }
 
-// -------------------- MbGrid-functions --------------------------
-std::pair<int,std::slice> MbSbp::GetBlockBoundarySliceAndSize(
-    int block_idx, Side side) {
-  return grid_.GetBlockBoundarySliceAndSize(block_idx, side);
+// -------------------- MbGrid-functions -------------------------
+BdSlice MbSbp::GetBdSlice(int block_idx, Side side) {
+  return grid_.GetBdSlice(block_idx, side);
 }
 
 std::vector< Block > MbSbp::blocks() {
@@ -384,10 +385,8 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
     Side side1 = interface.side1;
     Side side2 = interface.side2;
 
-    auto size_and_slice1 = grid_.GetBlockBoundarySliceAndSize(
-                                        block_idx1,side1);
-    auto size_and_slice2 = grid_.GetBlockBoundarySliceAndSize(
-                                     block_idx2,side2);
+    auto bd_slice1 = GetBdSlice(block_idx1, side1);
+    auto bd_slice2 = GetBdSlice(block_idx2, side2);
     Pinv = GetPinvAtBoundary(block_idx1, side1);
     Pgamma = GetBoundaryQuadrature(block_idx1, side1);
 
@@ -412,7 +411,7 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
            0.5*(n1*interp_[idx]->Interpolate(f2) -
                 interp_[idx]->Interpolate(n2*f2)));
 
-    df[block_idx1][size_and_slice1.second] += sat.array();
+    df[block_idx1][bd_slice1.slice] += sat.array();
 
     if(grid_.IsFilppedInterface(idx)) {
       f2.Reverse();
@@ -425,7 +424,7 @@ void MbSbp::InterfaceTreatment(const MbArray& f,
            0.5*(n2*interp_[idx]->Interpolate(f1) -
                interp_[idx]->Interpolate(n1*f1)));
 
-    df[block_idx2][size_and_slice2.second] += sat.array();
+    df[block_idx2][bd_slice2.slice] += sat.array();
     ++idx;
   }
 }

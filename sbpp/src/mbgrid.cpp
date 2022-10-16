@@ -218,9 +218,9 @@ Block MbGrid::GetBoundary(int block_idx, Side side) {
 
 Array MbGrid::ToBlockBoundary(const MbArray& f,
                               int block_idx, Side side) {
-  std::pair<int, std::slice> bd =
-  GetBlockBoundarySliceAndSize(block_idx,side);
-  return Array(1,bd.first,f[block_idx][bd.second]);
+  auto bd_slice = GetBdSlice(block_idx,side);
+  int size = bd_slice.slice.size();
+  return Array(1,size,f[block_idx][bd_slice.slice]);
 }
 
 MbArray MbGrid::Evaluate(std::function<double(double,double)> f) {
@@ -247,8 +247,7 @@ MbArray MbGrid::Evaluate(std::function<double(double,double)> f) {
  *    o side - the side, one of {s,e,n,w}
  *  Returns: std::pair - the size of the boundary (i.e. Nx or Ny) and the slice object.
  */
-std::pair<int,std::slice> MbGrid::
-GetBlockBoundarySliceAndSize(int block_idx, Side side) {
+BdSlice MbGrid::GetBdSlice(int block_idx, Side side) {
 
   int start  = 0, stride = 0, size = 0;
 
@@ -262,15 +261,15 @@ GetBlockBoundarySliceAndSize(int block_idx, Side side) {
     case Side::s: {start = 0; stride = Ny; size = Nx; break;}
     case Side::n: {start = Ny-1; stride = Ny; size = Nx; break;}
   }
- return std::make_pair(size,std::slice(start,size,stride));
+ return {side,block_idx,std::slice(start,size,stride)};
 }
 
 Array MbGrid::ToBlockBoundary(const Array& f,
                               int block_idx,
                               Side side) {
-  std::pair<int,std::slice> bd =
-    GetBlockBoundarySliceAndSize(block_idx,side);
-   return Array(1,bd.first,f[bd.second]);
+  auto bd_slice = GetBdSlice(block_idx,side);
+  int size = bd_slice.slice.size();
+   return Array(1,size,f[bd_slice.slice]);
 }
 
 // ----------- private function, used in the constructor ---------

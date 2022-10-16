@@ -103,11 +103,6 @@
 #include "mbarray.hpp"
 #include "mesh.hpp"
 
-struct BdSlice {
-  int block_idx;
-  std::slice slice; //slice.size() to get size
-};
-
 struct Corner {
    double x, y;
    double Size() const { return x*x + y*y; };
@@ -117,7 +112,20 @@ std::vector<Corner> GetCorners(const Block& block);
 bool CompareCornerSize(const Corner& lhs, const Corner& rhs);
 bool IsSameCorner(const Corner& lhs, const Corner& rhs);
 
+/*
+ * Calss to determine the side of a quadrilateral
+ */
 enum class Side {s, e, n, w};
+
+/*
+ * f[block_idx][slice] returns f at the boundary
+ */
+
+struct BdSlice {
+  Side side;
+  int block_idx;
+  std::slice slice; //slice.size() to get size
+};
 
 /*
  * Contains information on the intreface to an adjacent block.
@@ -191,8 +199,7 @@ class MbGrid {
     // Evaluate function z = f(x,y)
     MbArray Evaluate(std::function<double(double,double)>f);
 
-    std::pair<int,std::slice>
-      GetBlockBoundarySliceAndSize(int block_idx, Side side);
+    BdSlice GetBdSlice(int block_idx, Side side);
 
     Array ToBlockBoundary(const MbArray& f,
                           int block_idx, Side side);

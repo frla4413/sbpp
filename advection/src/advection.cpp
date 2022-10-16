@@ -98,8 +98,7 @@ void Advection::ApplySat(double t, const MbArray& sol,
     bd_quad = sbp_->GetBoundaryQuadrature(bd.block_idx, bd.side);
     normals = sbp_->GetNormals(bd.block_idx, bd.side);
 
-    auto bd_slice = sbp_->GetBlockBoundarySliceAndSize(
-                                bd.block_idx, bd.side);
+    auto bd_slice = sbp_->GetBdSlice(bd.block_idx, bd.side);
 
     Pinv = sbp_->GetPinvAtBoundary(bd.block_idx, bd.side);
     Pgamma = sbp_->GetBoundaryQuadrature(bd.block_idx, bd.side);
@@ -108,14 +107,15 @@ void Advection::ApplySat(double t, const MbArray& sol,
 
     Array direction = a_.first*normals.a1 + a_.second*normals.a2;
     direction = 0.5*(direction - Abs(direction));
-    Array sol_bd = Array(1,bd_slice.first,
-                         sol[bd.block_idx][bd_slice.second]);
-    Array analytic_bd = Array(1,bd_slice.first,
-                       analytic[bd.block_idx][bd_slice.second]);
+    int size = bd_slice.slice.size();
+    Array sol_bd = Array(1,size,
+                         sol[bd.block_idx][bd_slice.slice]);
+    Array analytic_bd = Array(1,size,
+                        analytic[bd.block_idx][bd_slice.slice]);
 
     Array pen = direction*Pinv*Pgamma*(sol_bd - analytic_bd);
 
-    rhs[bd.block_idx][bd_slice.second] +=  pen.array();
+    rhs[bd.block_idx][bd_slice.slice] +=  pen.array();
   }
 }
 

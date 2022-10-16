@@ -129,9 +129,7 @@ class MbSbp {
 
     Array ToBlockBoundary(const Array& f, int block_idx, Side side);
 
-    std::pair<int,std::slice>
-      GetBlockBoundarySliceAndSize(int block_idx,
-                             Side side);
+   BdSlice GetBdSlice(int block_idx, Side side);
 
     bool IsFilppedInterface(int interface_idx);
 
