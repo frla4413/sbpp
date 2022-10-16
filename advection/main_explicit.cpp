@@ -31,11 +31,11 @@
 
 int main() {
   double t0 = 0;
-  double t1 = 5;
+  double t1 = 10;
 
   std::vector<double> tspan{t0,t1};
   std::pair<double,double> a{1,1};
-  std::valarray<int> N_vec{21,41,81};
+  std::valarray<int> N_vec{81};
 
   std::valarray<double> err_vec(N_vec.size());
   int order = 4;

@@ -9,7 +9,8 @@ set(CMAKE_CXX_FLAGS "-g")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "${CMAKE_SOURCE_DIR}")
 
 set(PROJECT_NAME "advection")
-set(MAIN_FILE "advection/main_implicit.cpp")
+set(MAIN_FILE "advection/main_explicit.cpp")
+#set(MAIN_FILE "build_grid.cpp")
 set(SRC_FILES "advection/src/advection.cpp")
 set(INCLUDE_DIR "advection/include")
 
