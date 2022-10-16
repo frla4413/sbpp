@@ -103,9 +103,9 @@
 #include "mbarray.hpp"
 #include "mesh.hpp"
 
-struct BdSizeSlice {
-  int size;
-  std::slice slice;
+struct BdSlice {
+  int block_idx;
+  std::slice slice; //slice.size() to get size
 };
 
 struct Corner {

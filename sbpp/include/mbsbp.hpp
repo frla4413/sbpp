@@ -16,22 +16,53 @@
  * differentiation (Dx, Dy).
  *
  * Member functions:
- *  o
- *  o
- *  o
+ *  o ArrayPair GetNormals(block_idx, side)
+ *  o MbArray Dx(f)
+ *  o MbArray Dy(f)
+ *  o MbArray DxAndInterface(f)
+ *  o MbArray DyAndInterface(f)
+ *  o Integrate(f)
+ *  o Array GetBoundaryQuadrature(block_idx, side)
+ *  o Array GetPinvAtBoundary(block_idx, side)
+ *  o MbGrid grid()
+ * functions to be used for SAT:
+ *  o Array Dn(f, block_idx, side)
+ *  o Array Dx(f, block_idx)
+ *  o Array Dy(f, block_idx)
+ *  o Array DnT(f, block_idx, side)
+ *  o Array DxT(f, block_idx)
+ *  o Array DyT(f, block_idx)
+ * MbGrid-functions:
+ *  o MbArray Evaluate(function<double(double,double)> f)
+ *  o std::vector<Block> blocks()
+ *  o Block blocks(int block_idx)
+ *  o int num_blocks()
+ *  o std::vector<Shape> shapes()
+ *  o Shape shapes(block_idx)
+ *  o std::vector<Interface> interfaces()
+ *  o std::vector<BoundaryInfo> boundaries()
+ *  o Array ToBlockBoundary(f, block_idx, side)
+ *  o Array ToBlockBoundary(f, block_idx, side)
+ *  o std::pair<int,std::slice> GetBlockBoundarySliceAndSize(block_idx, Side side)
+ *  o bool IsFilppedInterface(interface_idx)
  *
  * Private functions:
- *  o
+ *  o SetNormalsAndBoundaryQuadratures(block_idx)
+ *  o SetInterpolationOperators()
+ *  o InterfaceTreatment(f, df, direction)
  *
  * Member variables:
- *  o
- *
- * Non-member functions:
- *  o
+ *  o MbGrid grid
+ *  o int order
+ *  o vector<std::unique_ptr<Sbp>> sbp
+ *  o vector<std::unique_ptr<Interp>> interp
+ *  o vector<Array> x_xi, x_eta, y_xi, y_eta, J, invJ
+ *  o p_inv_west_, p_inv_east, p_inv_south, p_inv_north
+ *  o bd_quad_west_, bd_quad_east_, bd_quad_south_, bd_quad_north
+ *  o nw, ne, ns, nn
  *
  * Other data structes defined here:
- *  o
- *
+ *  o enum class Direction {x,y}
  */
 
 #pragma once
@@ -104,7 +135,6 @@ class MbSbp {
 
     bool IsFilppedInterface(int interface_idx);
 
-    // ------------------ MbGrid-functions -------------------
 
   private:
     // ------------------- functions ---------------------------

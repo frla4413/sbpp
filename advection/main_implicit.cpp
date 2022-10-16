@@ -31,6 +31,7 @@
 #include "basics.hpp"
 
 int main() {
+  auto foo = std::slice(1,10,1);
 
   double t0 = 0;
   double t1 = 1;
