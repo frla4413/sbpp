@@ -66,8 +66,9 @@ int main() {
       sol = ExplicitIntegration(tspan, initial, dt, rhs_fun,
             write_to_file, AdvectionToTec, name_base);
     }
-
-    sol = ExplicitIntegration(tspan, initial, dt, rhs_fun);
+    else {
+      sol = ExplicitIntegration(tspan, initial, dt, rhs_fun);
+    }
     err_vec[err_vec_pos] = advec.ComputeError(sol.t,sol.y);
     std::cout << "\nError: " << err_vec[err_vec_pos] << "\n";
     ++err_vec_pos;

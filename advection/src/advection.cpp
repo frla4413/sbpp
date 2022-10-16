@@ -136,7 +136,7 @@ MbArray Advection::Jacobian(double t, const MbArray& f) {
   auto g_func = [&](double t){
     return sbp_->Evaluate(data_func);
   };
-  ApplySat(t,f,rhs, g_func);
+  ApplySat(t,f,rhs,g_func);
   return rhs;
 }
 

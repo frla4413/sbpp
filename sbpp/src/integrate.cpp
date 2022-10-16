@@ -83,78 +83,48 @@ MbArray RK4Step(double t, const MbArray& y, double dt,
  *   o Solution containing the approximation to y(t1) and t1.
  */
 
-Solution ImplicitTimeIntegraction(std::vector< double >& tspan,
-                                  const MbArray& y0, double dt,
+Solution ImplicitIntegraction(std::vector< double >& tspan,
+                              const MbArray& y0, double dt,
         std::function<MbArray(double, const MbArray&)> odefun,
-        std::function<MbArray(double, const MbArray&)> Jv) {
+        std::function<MbArray(double, const MbArray&)> Jv,
+        bool write_to_file,
+        std::function<void(const MbArray&,const std::string&)>
+        export_to_tec,
+        std::string name_base) {
+
   int NoS  = static_cast<int>(ceil((tspan[1] - tspan[0])/dt));
+
+  int steps_per_time, print_interval, tec_pos;
+  if(write_to_file) {
+    steps_per_time = static_cast<int>(
+                         ceil(NoS/(tspan[1] - tspan[0])));
+    print_interval = ceil(steps_per_time/15);
+    tec_pos = 0;
+  }
 
   MbArray y = y0, y_prev = y0, y_prev_prev = y0;
   double t = tspan[0];
 
   for(int i : tq::trange(NoS)) {
+    if( write_to_file && i % print_interval == 0) {
+      // write to file
+      std::string file_name = name_base + std::to_string(tec_pos);
+      export_to_tec(y,file_name);
+      ++tec_pos;
+    }
 
     t = tspan[0] + (i+1)*dt;
-//    if(i == 0) {
+    if(i == 0) {
       y = BDF1Step(y_prev, dt, t, odefun, Jv);
- //   }
- //   else {
- //     y_prev_prev = y_prev;
- //     y_prev = y;
- //     y = BDF2Step(y_prev_prev,y_prev, dt, t, odefun, Jv);
- //   }
+    }
+    else {
+      y_prev_prev = y_prev;
+      y_prev = y;
+      y = BDF2Step(y_prev_prev,y_prev, dt, t, odefun, Jv);
+    }
   }
   return {t,y};
 }
-
-//Solution ImplicitTimeIntegractionSaveSolution(std::vector< double >& tspan,
-//                                     const MbArray& y0, double dt,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<MbArray(double, const MbArray&)> Jv,
-//        std::function<void(const MbArray&, const std::string&)> export_to_tec,
-//        std::string name_base)
-//{
-//     int NoS  = static_cast<int>(ceil((tspan[1] - tspan[0])/dt));
-//     int steps_per_time = static_cast<int>( ceil(NoS/(tspan[1] - tspan[0])));
-//     int interval = ceil(steps_per_time/15);
-//
-//     MbArray y = y0, y_prev = y0, y_prev_prev = y0, y_prev_prev_prev = y0;
-//     double t = tspan[0];
-//
-//     int tec_pos = 0;
-//     for(int i : tq::trange(NoS))
-//     {
-//        if(i % interval == 0)
-//        {
-//           std::string file_name = name_base + std::to_string(tec_pos);
-//           export_to_tec(y,file_name);
-//           tec_pos ++;
-//        }
-//
-//        t = tspan[0] + (i+1)*dt;
-//        if(i == 0)
-//        {
-//           y = BDF1Step(y_prev, dt, t, odefun, Jv);
-//        }
-//        else if(i == 1)
-//        {
-//           y_prev_prev = y_prev;
-//           y_prev = y;
-//           y = BDF2Step(y_prev_prev,y_prev, dt, t, odefun, Jv);
-//        }
-//        else
-//        {
-//           y_prev_prev_prev = y_prev_prev;
-//           y_prev_prev = y_prev;
-//           y_prev = y;
-//           y = BDF3Step(y_prev_prev_prev, y_prev_prev, y_prev, dt, t, odefun, Jv);
-//        }
-//     }
-//     Solution solution;
-//     solution.sol = y;
-//     solution.time = t;
-//     return solution;
-//}
 
 MbArray BDF1Step(const MbArray& y_prev, double dt, double t,
         std::function<MbArray(double, const MbArray&)> odefun,
@@ -172,7 +142,7 @@ MbArray BDF1Step(const MbArray& y_prev, double dt, double t,
   double tol = 1e-10;
 
   MbArray b, delta, init;
-  double inf_err;
+  double err_norm;
 
   b = F(t,y_new);
   for(int k = 0; k < 10; ++k) {
@@ -180,93 +150,86 @@ MbArray BDF1Step(const MbArray& y_prev, double dt, double t,
 
     y_new -= delta;
     b = F(t,y_new);
-    inf_err = InfNorm(b);
-    if(inf_err < tol){ break; }
+    err_norm = Norm(b,NormType::inf);
+    if(err_norm < tol){ break; }
   }
-  if (inf_err > tol) {
+  if (err_norm > tol) {
      std::cout << "BDF1: GMRES NOT CONVERGED " <<
-                 "inf_err: " << inf_err << std::endl;
+                  "err_norm: " << err_norm << std::endl;
   }
   return y_new;
 }
 
-//MbArray BDF2Step(const MbArray& y_prev_prev, const MbArray& y_prev, 
-//        double dt, double t,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<MbArray(double, const MbArray&)> Jv)
-//{
-//     MbArray y_new = y_prev; 
-//
-//     auto F = [&dt, y_prev_prev, y_prev, odefun](double t, 
-//                             const MbArray& y_new)
-//     {
-//        return (y_new - (4.0/3.0)*y_prev + (1.0/3.0)*y_prev_prev)  
-//               + dt*(2.0/3.0)*odefun(t, y_new);
-//     };
-//
-//     auto Jv_func = [&dt, Jv, t](const MbArray& v)
-//     {
-//        return v + dt*(2.0/3.0)*Jv(t, v);
-//     };
-//
-//     MbArray b, delta, init;
-//     double l2err;
-//
-//     b = F(t,y_new);
-//     for(int k = 0; k < 10; k++)
-//     {
-//        delta = GMRESMKL(Jv_func, b, init);
-//
-//        y_new -= delta;
-//        b = F(t,y_new);
-//        l2err = Basics::L2Norm(b);
-//        if(l2err < 1e-10){ break; }
-//     }
-//     if (l2err > 1e-10) {std::cout << "BDF2: GMRES NOT CONVERGED " << 
-//                                      "l2err: " << l2err << std::endl;}
-//
-//     return y_new;
-//}
-//
-//MbArray BDF3Step(const MbArray& y_prev_prev_prev, 
-//                      const MbArray& y_prev_prev, 
-//                      const MbArray& y_prev, 
-//                      double dt, double t,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<MbArray(double, const MbArray&)> Jv)
-//{
-//     MbArray y_new = y_prev;
-//
-//     auto F = [&dt, y_prev_prev_prev,y_prev_prev, y_prev, odefun](double t, 
-//                             const MbArray& y_new)
-//     {
-//        return y_new - (18.0/11.0)*y_prev + (9.0/11.0)*y_prev_prev  
-//                     - (2.0/11.0)*y_prev_prev_prev
-//               + dt*(6.0/11.0)*odefun(t, y_new);
-//     };
-//
-//     auto Jv_func = [&dt, Jv, t](const MbArray& v)
-//     {
-//        return v + dt*(6.0/11.0)*Jv(t, v);
-//     };
-//
-//     MbArray b, delta, init;
-//     double l2err;
-//
-//     b = F(t,y_new);
-//     for(int k = 0; k < 10; k++)
-//     {
-//        delta = GMRESMKL(Jv_func, b, init);
-//
-//        y_new -= delta;
-//        b = F(t,y_new);
-//        l2err = Basics::L2Norm(b);
-//        if(l2err < 1e-10){ break; }
-//     }
-//     if (l2err > 1e-10) {std::cout << "BDF2: GMRES NOT CONVERGED" << 
-//                                      "l2err: " << l2err << std::endl;}
-//     return y_new;
-//}
+MbArray BDF2Step(const MbArray& y_prev_prev, const MbArray& y_prev,
+        double dt, double t,
+        std::function<MbArray(double, const MbArray&)> odefun,
+        std::function<MbArray(double, const MbArray&)> Jv) {
+  MbArray y_new = y_prev;
+
+  auto F = [&dt, y_prev_prev, y_prev, odefun](double t,
+                          const MbArray& y_new) {
+     return (y_new - (4.0/3.0)*y_prev + (1.0/3.0)*y_prev_prev)
+            + dt*(2.0/3.0)*odefun(t, y_new);
+  };
+
+  auto Jv_func = [&dt, Jv, t](const MbArray& v) {
+     return v + dt*(2.0/3.0)*Jv(t, v);
+  };
+
+  MbArray b, delta, init;
+  double err_norm;
+
+  b = F(t,y_new);
+  for(int k = 0; k < 10; ++k) {
+     delta = GMRESMKL(Jv_func, b, init);
+
+     y_new -= delta;
+     b = F(t,y_new);
+     err_norm = Norm(b, NormType::inf);
+     if(err_norm < 1e-10){ break; }
+  }
+  if (err_norm > 1e-10) {
+    std::cout << "BDF2: GMRES NOT CONVERGED " << "norm: "
+      << err_norm << std::endl;}
+  return y_new;
+}
+
+MbArray BDF3Step(const MbArray& y_prev_prev_prev,
+                      const MbArray& y_prev_prev,
+                      const MbArray& y_prev,
+                      double dt, double t,
+        std::function<MbArray(double, const MbArray&)> odefun,
+        std::function<MbArray(double, const MbArray&)> Jv) {
+  MbArray y_new = y_prev;
+
+  auto F = [&dt, y_prev_prev_prev,y_prev_prev,y_prev,odefun]
+           (double t, const MbArray& y_new) {
+    return y_new - (18.0/11.0)*y_prev +
+                   (9.0/11.0)*y_prev_prev -
+                   (2.0/11.0)*y_prev_prev_prev +
+                dt*(6.0/11.0)*odefun(t, y_new);
+  };
+
+  auto Jv_func = [&dt, Jv, t](const MbArray& v) {
+    return v + dt*(6.0/11.0)*Jv(t, v);
+  };
+
+  MbArray b, delta, init;
+  double l2err;
+
+  b = F(t,y_new);
+  for(int k = 0; k < 10; ++k) {
+    delta = GMRESMKL(Jv_func, b, init);
+
+    y_new -= delta;
+    b = F(t,y_new);
+    l2err = Norm(b, NormType::inf);
+    if(l2err < 1e-10){ break; }
+  }
+  if (l2err > 1e-10) {std::cout << "BDF2: GMRES NOT CONVERGED" << 
+                                   "l2err: " << l2err << std::endl;}
+  return y_new;
+}
 
 
 /*

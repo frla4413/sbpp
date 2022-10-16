@@ -58,36 +58,25 @@ MbArray RK4Step(double t, const MbArray& y, double dt,
 //// --------------------------------------------------------------
 //// ------------------ Implicit time integration ------------------
 //// ---------------------------------------------------------------
-Solution ImplicitTimeIntegraction(std::vector< double >& tspan,
-                                     const MbArray& y0, double dt,
+Solution ImplicitIntegraction(std::vector< double >& tspan,
+                              const MbArray& y0, double dt,
         std::function<MbArray(double, const MbArray&)> odefun,
-        std::function<MbArray(double, const MbArray&)> Jv);
+        std::function<MbArray(double, const MbArray&)> Jv,
+        bool write_to_file = false,
+        std::function<void(const MbArray&,const std::string&)>
+        export_to_tec = NULL,
+        std::string name_base = "none");
 
-//Solution ImplicitTimeIntegractionSaveSolution(std::vector< double >& tspan,
-//                                     const MbArray& y0, double dt,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<MbArray(double, const MbArray&)> Jv,
-//        std::function<void(const MbArray&, const std::string&)> export_to_tec,
-//        std::string name_base);
-//
-//
 MbArray BDF1Step(const MbArray& y_prev,
                       double dt, double t,
         std::function<MbArray(double, const MbArray&)> odefun,
         std::function<MbArray(double, const MbArray&)> Jv);
 
-//MbArray BDF2Step(const MbArray& y_prev_prev,
-//                      const MbArray& y_prev,
-//                      double dt, double t,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<MbArray(double, const MbArray&)> Jv);
-//
-//MbArray BDF3Step(const MbArray& y_prev_prev_prev,
-//                      const MbArray& y_prev_prev,
-//                      const MbArray& y_prev, 
-//                      double dt, double t,
-//        std::function<MbArray(double, const MbArray&)> odefun,
-//        std::function<MbArray(double, const MbArray&)> Jv);
+MbArray BDF2Step(const MbArray& y_prev_prev,
+                    const MbArray& y_prev,
+                    double dt, double t,
+      std::function<MbArray(double, const MbArray&)> odefun,
+      std::function<MbArray(double, const MbArray&)> Jv);
 
 // documentation:
 // https://software.intel.com/content/www/us/en/develop/documentation/onemkl-developer-reference-c/top.html

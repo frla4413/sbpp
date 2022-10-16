@@ -166,7 +166,8 @@ const std::vector<Interface>& MbGrid::interfaces() const {
   return interfaces_;
 };
 
-std::vector<std::vector<BlockInterface>> MbGrid::GetBlockInterfaces() {
+std::vector<std::vector<BlockInterface>>MbGrid::GetBlockInterfaces
+() {
   return block_interfaces_;
 };
 
@@ -189,9 +190,10 @@ bool MbGrid::IsFilppedInterface(int interface_idx) {
 
   std::pair<Side,Side> sides = std::make_pair(side1,side2);
 
-  auto FindInterface = [&sides](std::pair<Side,Side>& sides_)
-             {return sides_.first == sides.first &&
-               sides_.second == sides.second;};
+  auto FindInterface = [&sides](std::pair<Side,Side>& sides_) {
+    return sides_.first == sides.first &&
+           sides_.second == sides.second;
+  };
   auto it = std::find_if(flipped_interfaces_.begin(),
                          flipped_interfaces_.end(),
                          FindInterface);

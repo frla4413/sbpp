@@ -323,11 +323,13 @@ double Max(const MbArray& mb_array) {
   return max;
 }
 
-double InfNorm(const MbArray& mb_array) {
+double Norm(const MbArray& f, NormType type) {
 
-  auto max = mb_array[0][0];
+  if (type == NormType::l2)
+    return sqrt(Sum(f*f));
 
-  for(auto& array : mb_array.arrays()) {
+  auto max = f[0][0];
+  for(auto& array : f.arrays()) {
     auto array_max = Max(Abs(array));
     if(array_max > max)
       max = array_max;

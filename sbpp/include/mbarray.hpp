@@ -31,7 +31,7 @@
  *  o Min(MbArray)
  *  o Max(MbArray)
  *  o Abs(MbArray)
- *  o InfNorm(MbArray)
+ *  o Norm(MbArray, NormType::inf,l2)
  */
 
 #pragma once
@@ -130,7 +130,10 @@ double Sum(const MbArray& mb_array);
  */
 MbArray Abs(const MbArray& mb_array);
 
+
+enum class NormType {inf, l2};
+
 /*
- * Return max(abs(mbarray))
+ * inf norm or l2 norm
  */
-double InfNorm(const MbArray& mb_array);
+double Norm(const MbArray& mb_array, NormType type);

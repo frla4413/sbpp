@@ -1,7 +1,3 @@
-#include interpolate.hpp
-#include interpolate21.hpp
-#include interpolate42.hpp
-
 #include "ins.h"
 #include "integrate_ins.h"
 Använd "static" in interpolate42-klassen

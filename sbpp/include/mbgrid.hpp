@@ -103,8 +103,8 @@
 #include "mbarray.hpp"
 #include "mesh.hpp"
 
-struct BdSlice {
-  int block_idx;
+struct BdSizeSlice {
+  int size;
   std::slice slice;
 };
 
