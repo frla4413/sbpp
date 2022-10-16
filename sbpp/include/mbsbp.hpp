@@ -32,8 +32,7 @@
  * Other data structes defined here:
  *  o
  *
-  */
-
+ */
 
 #pragma once
 #include <iostream>

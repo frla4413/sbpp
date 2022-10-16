@@ -12,14 +12,14 @@ Array GetConvergenceRates(const std::valarray<int>& n_array,
 }
 
 void PrintConvergence(const std::valarray<int>& n_array,
-                     const std::valarray<double>& err_array) {
+                      const std::valarray<double>& err_array) {
 
+  auto rates{GetConvergenceRates(n_array, err_array)};
   std::cout<< "N: \t Error: \t Rates\n";
-  Array rates = GetConvergenceRates(n_array, err_array);
-  std::cout<< n_array[0] << "\t" <<
+  std::cout << n_array[0] << "\t" <<
   std::scientific << std::setprecision(3)
                   << err_array[0] << "\n";
-  for(int i = 1; i < n_array.size(); i++)
+  for(int i = 1; i < n_array.size(); ++i)
     std::cout << n_array[i] << "\t" << std::scientific
               << std::setprecision(3) << err_array[i] << "\t"
               << std::fixed << std::setprecision(3)

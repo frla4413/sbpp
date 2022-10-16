@@ -6,7 +6,6 @@
 // --------------------------------------------------------------
 // ----------------- Explicit time integration ------------------
 // --------------------------------------------------------------
-
 Solution ExplicitIntegration(std::vector<double>& tspan,
                              const MbArray& y0, double dt,
         std::function<MbArray(double, const MbArray&)> odefun,
@@ -85,7 +84,7 @@ MbArray RK4Step(double t, const MbArray& y, double dt,
  */
 
 Solution ImplicitTimeIntegraction(std::vector< double >& tspan,
-                                     const MbArray& y0, double dt,
+                                  const MbArray& y0, double dt,
         std::function<MbArray(double, const MbArray&)> odefun,
         std::function<MbArray(double, const MbArray&)> Jv) {
   int NoS  = static_cast<int>(ceil((tspan[1] - tspan[0])/dt));
@@ -156,12 +155,12 @@ Solution ImplicitTimeIntegraction(std::vector< double >& tspan,
 //     solution.time = t;
 //     return solution;
 //}
-//
+
 MbArray BDF1Step(const MbArray& y_prev, double dt, double t,
         std::function<MbArray(double, const MbArray&)> odefun,
         std::function<MbArray(double, const MbArray&)> Jv) {
-     MbArray y_new = y_prev; 
 
+  MbArray y_new = y_prev;
   auto F = [&dt, y_prev, odefun](double t, const MbArray& y_new) {
     return (y_new - y_prev)  + dt*odefun(t, y_new);
   };
@@ -170,13 +169,13 @@ MbArray BDF1Step(const MbArray& y_prev, double dt, double t,
     return v + dt*Jv(t, v);
   };
 
-  double tol = 1e-8;
+  double tol = 1e-10;
 
   MbArray b, delta, init;
   double inf_err;
 
   b = F(t,y_new);
-  for(int k = 0; k < 10; k++) {
+  for(int k = 0; k < 10; ++k) {
     delta = GMRESMKL(Jv_func, b, init);
 
     y_new -= delta;
@@ -190,7 +189,7 @@ MbArray BDF1Step(const MbArray& y_prev, double dt, double t,
   }
   return y_new;
 }
-//
+
 //MbArray BDF2Step(const MbArray& y_prev_prev, const MbArray& y_prev, 
 //        double dt, double t,
 //        std::function<MbArray(double, const MbArray&)> odefun,
@@ -320,34 +319,32 @@ MbArray GMRESMKL(std::function<MbArray(const MbArray&)> Ax,
   dfgmres_check(&N,&sol[0],&b_arr[0],&RCI_request,
                 &ipar[0],&dpar[0],&tmp[0]);
 
-  GMRES: {
-    dfgmres(&N, &sol[0], &b_arr[0], &RCI_request,
-            &ipar[0], &dpar[0], &tmp[0]);
+GMRES: {
+  dfgmres(&N, &sol[0], &b_arr[0], &RCI_request,
+          &ipar[0], &dpar[0], &tmp[0]);
 
-    switch (RCI_request) {
+   switch (RCI_request) {
       case 0:
-         goto COMPLETE;
-      case 1: {
-            work = MbArray(b.shapes(),
-                           tmp[std::slice(ipar[21]-1,N,1)]);
-            work = Ax(work);
-            tmp[std::slice(ipar[22]-1,N,1)] =
-              work.ToValarray();
-            goto GMRES;
-      }
-      case 4: {
+        goto COMPLETE;
+      case 1:
+        work = MbArray(b.shapes(),
+                       tmp[std::slice(ipar[21]-1,N,1)]);
+        work = Ax(work);
+        tmp[std::slice(ipar[22]-1,N,1)] = work.ToValarray();
+        goto GMRES;
+      case 4:
+         {
             if(dpar[6] < 1e-12)
                goto COMPLETE;
             else
                goto GMRES;
-      }
-    }
-  }
-
+         }
+   }
+}
   COMPLETE: {
     ipar[12] = 0;
     dfgmres_get(&N, &sol[0], &b_arr[0], &RCI_request, 
                 &ipar[0], &dpar[0], &tmp[0], &iter);
-    return MbArray(b.shapes(), sol);
+    return {b.shapes(), sol};
   }
 }

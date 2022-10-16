@@ -41,7 +41,6 @@ MbArray::MbArray(const Arrays& arrays) {
   arrays_ = arrays;
 }
 
-
 MbArray::MbArray(const Shapes& shapes, const valarray& f) :
   shapes_(shapes) {
    int start = 0;
@@ -335,6 +334,7 @@ double InfNorm(const MbArray& mb_array) {
   }
   return max;
 }
+
 double Sum(const MbArray& mb_array) {
 
   auto sum = 0.0;
