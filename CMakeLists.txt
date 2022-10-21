@@ -8,11 +8,10 @@ set(CMAKE_CXX_FLAGS "-g")
 # to produce compile_commands.json:
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON CACHE INTERNAL "${CMAKE_SOURCE_DIR}")
 
-set(PROJECT_NAME "advection")
-set(MAIN_FILE "advection/main_explicit.cpp")
-#set(MAIN_FILE "build_grid.cpp")
-set(SRC_FILES "advection/src/advection.cpp")
-set(INCLUDE_DIR "advection/include")
+set(PROJECT_NAME "ins")
+set(MAIN_FILE "ins/ins_main.cpp")
+set(SRC_FILES "ins/src/ins.cpp" "ins/src/integrate_ins.cpp")
+set(INCLUDE_DIR "ins/include")
 
 project(${PROJECT_NAME} LANGUAGES CXX C)
 

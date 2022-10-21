@@ -20,17 +20,18 @@ void Sbp21::Diff(const double* f, double* df,
     df[stride*i] = (f[stride*(i+1)] - f[stride*(i-1)])/(2*h);
 }
 
-//void Sbp21::DT(const double* f, double* dtf, int stride, int length, double h)
-//{
-//  dtf[0] = (-f[stride]/2-f[0])/h;
-//  dtf[1] = (-f[stride]/2+f[0])/h;
-//  dtf[stride*(length-2)] = (-f[stride*(length-1)]+f[stride*(length-2)]/2)/h;
-//  dtf[stride*(length-1)] = (f[stride*(length-1)]+f[stride*(length-2)]/2)/h;
-//  for(int i = 2; i < length-2; i++)
-//   {
-//       dtf[stride*i] = (-f[stride*(i+1)] + f[stride*(i-1)])/(2*h);
-//   }
-//}
+void Sbp21::DT(const double* f, double* dtf,
+               int stride, int length, double h) {
+  dtf[0] = (-f[stride]/2-f[0])/h;
+  dtf[1] = (-f[stride]/2+f[0])/h;
+  dtf[stride*(length-2)] = (-f[stride*(length-1)] +
+                            f[stride*(length-2)]/2)/h;
+  dtf[stride*(length-1)] = (f[stride*(length-1)] +
+                            f[stride*(length-2)]/2)/h;
+  for(int i = 2; i < length-2; ++i) {
+    dtf[stride*i] = (-f[stride*(i+1)] + f[stride*(i-1)])/(2*h);
+  }
+}
 
 Array Sbp21::GetQuadratureWeights(int N) const {
   std::valarray <double> weights(1,N);

@@ -555,7 +555,7 @@ void ExportToTec(const MbGrid& grid, const MbArray& vec,
 
   std::ofstream outfile;
   outfile.open(name + ".tec");
-  outfile << "TITLE = 'ins_solution.tec' \n";
+  outfile << "TITLE = 'solution.tec' \n";
   outfile << "VARIABLES = x,y,u \n";
 
   Array X,Y;

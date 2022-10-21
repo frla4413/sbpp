@@ -42,8 +42,8 @@ class Sbp {
     Array DEta(const Array& f) const;
     Array DXi(const Array& f) const;
 
-//    Array DEtaT(const Array&);
-//    Array DXiT(const Array&);
+    Array DEtaT(const Array&);
+    Array DXiT(const Array&);
 
     virtual double Integrate(const Array&) const = 0;
     Array GetP() const;
@@ -60,5 +60,6 @@ class Sbp {
     double d_xi_ = -1, d_eta_ = -1;
     virtual void Diff(const double* f, double* df,
                       int,int,double) const = 0;
-//    virtual void DT(const double* f,double* DTf,int,int,double) = 0;
+    virtual void DT(const double* f, double* DTf,
+                    int stride,int length, double h) = 0;
 };

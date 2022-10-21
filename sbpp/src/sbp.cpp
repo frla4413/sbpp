@@ -38,22 +38,50 @@ Array Sbp::DEta(const Array& f) const {
   return dfEta;
 }
 
+Array Sbp::DEtaT(const Array& f) {
+// DyT on a rectangular grid
+   int stride = 1;
+   int length = Ny_;
+
+   auto dfEtaT {Array(Nx_,Ny_)};
+
+   const double* f_pointer;
+
+   for(int i = 0; i < Nx_; ++i) {
+     DT(&f[i*Ny_], &dfEtaT[i*Ny_], stride, length, d_eta_);
+   }
+   return dfEtaT;
+}
+
 Array Sbp::DXi(const Array& f) const {
   int stride = Ny_;
   int length = Nx_;
 
   Array dfXi{Nx_,Ny_};
 
-  for(int i = 0; i < Ny_; i++) {
+  for(int i = 0; i < Ny_; ++i) {
     Diff(&f[i], &dfXi[i], stride, length, d_xi_);
   }
   return dfXi;
 }
 
+Array Sbp::DXiT(const Array& f) {
+// DxT on a rectangular grid
+  int stride = Ny_;
+  int length = Nx_;
+
+  auto dfXiT {Array(Nx_,Ny_)};
+
+  for(int i = 0; i < Ny_; ++i) {
+     DT(&f[i], &dfXiT[i], stride, length, d_xi_);
+  }
+  return dfXiT;
+}
+
 Array Sbp::GetP() const {
 
-  Array weights_x = GetQuadratureWeights(Nx_);
-  Array weights_y = GetQuadratureWeights(Ny_);
+  auto weights_x {GetQuadratureWeights(Nx_)};
+  auto weights_y {GetQuadratureWeights(Ny_)};
 
   std::valarray<double> p(Nx_*Ny_);
 

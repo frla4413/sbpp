@@ -25,7 +25,7 @@ class Sbp42:public Sbp {
 
   private:
     void Diff(const double* f, double* df, int, int, double) const;
-    //void DT(const double* f, double* dtf, int, int, double);
+    void DT(const double* f, double* dtf, int, int, double);
 
     // weights
     double h1_ = 17.0/48.0;

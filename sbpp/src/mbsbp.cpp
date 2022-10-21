@@ -172,59 +172,56 @@ Array MbSbp::Dy(const MbArray& f, int block_idx) {
  * Dn = Nx*Dx + Ny*Dy at block_idx, boundary side
  * Uses DxT and DyT
  */
-//Array MbSbp::DnT(const MbArray& f, int block_idx, Side side) {
-//   auto bd_slice = GetBlockBoundarySliceAndSize(block_idx, side);
-//   auto normals = GetNormals(block_idx, side);
-//
-//   std::vector<Array> nx_f (num_blocks());
-//   nx_f[block_idx] = Array(shapes(block_idx).Nx,
-//                           shapes(block_idx).Ny);
-//   nx_f[block_idx][bd_slice.second] = normals.a1.array()*
-//                                  f[block_idx][bd_slice.second];
-//
-//   std::valarray DxT_nx_f = DxT(nx_f, block_idx)[bd_slice.second];
-//
-//   std::vector<Array> ny_f (num_blocks());
-//   ny_f[block_idx] = Array(shapes(block_idx).Nx,
-//                           shapes(block_idx).Ny);
-//   ny_f[block_idx][bd_slice.second] = normals.a2.array()*
-//                                  f[block_idx][bd_slice.second];
-//
-//   std::valarray DyT_ny_f = DyT(ny_f, block_idx)[bd_slice.second];
-//   return Array(1, bd_slice.first, DxT_nx_f + DyT_ny_f);
-//}
+Array MbSbp::DnT(const Array& f, int block_idx, Side side) {
+  auto bd_slice {GetBdSlice(block_idx, side)};
+  auto normals {GetNormals(block_idx, side)};
+  int Nx = shapes(block_idx).Nx;
+  int Ny = shapes(block_idx).Ny;
+
+  auto nx_f {Array(Nx, Ny)};
+  nx_f[bd_slice.slice] = normals.a1.array()*f[bd_slice.slice];
+
+  auto DxT_nx_f = DxT(nx_f, block_idx);
+
+  auto ny_f {Array(Nx, Ny)};
+  ny_f[bd_slice.slice] = normals.a2.array()*f[bd_slice.slice];
+
+  auto DxTnxf {Array(1,Ny,DxT(nx_f, block_idx)[bd_slice.slice])};
+  auto DyTnyf {Array(1,Ny,DyT(ny_f, block_idx)[bd_slice.slice])};
+  return DxTnxf + DyTnyf;
+}
 
 /*
- * Transpose(Dx) * f on block block_idx. 
+ * Transpose(Dx) * f on block block_idx.
  * To be used in SAT:s where DnT is needed.
  */
-//Array MbSbp::DxT(const MbArray& f, int block_idx) {
-//
-//  Array Jinv_f = 0.5*invJ_[block_idx]*f[block_idx];
-//  Array y_eta = y_eta_[block_idx];
-//  Array y_xi = y_xi_[block_idx];
-//
-//  return sbp_[block_idx]->DXiT(y_eta*Jinv_f) +
-//         y_eta*sbp_[block_idx]->DXiT(Jinv_f) -
-//         sbp_[block_idx]->DEtaT(y_xi*Jinv_f) -
-//         y_xi*sbp_[block_idx]->DEtaT(Jinv_f);
-//}
+Array MbSbp::DxT(const Array& f, int block_idx) {
+
+  Array Jinv_f = 0.5*invJ_[block_idx]*f;
+  Array y_eta = y_eta_[block_idx];
+  Array y_xi = y_xi_[block_idx];
+
+  return sbp_[block_idx]->DXiT(y_eta*Jinv_f) +
+         y_eta*sbp_[block_idx]->DXiT(Jinv_f) -
+         sbp_[block_idx]->DEtaT(y_xi*Jinv_f) -
+         y_xi*sbp_[block_idx]->DEtaT(Jinv_f);
+}
 
 /*
  * Transpose(Dy) * f on block block_idx.
  * To be used in SAT:s where DnT is needed.
  */
-//Array MbSbp::DyT(const MbArray& f, int block_idx) {
-//
-//  Array Jinv_f = 0.5*invJ_[block_idx]*f[block_idx];
-//  Array x_eta = x_eta_[block_idx];
-//  Array x_xi = x_xi_[block_idx];
-//
-//  return sbp_[block_idx]->DEtaT(x_xi*Jinv_f) +
-//         x_xi*sbp_[block_idx]->DEtaT(Jinv_f) -
-//         sbp_[block_idx]->DXiT(x_eta*Jinv_f) -
-//         x_eta*sbp_[block_idx]->DXiT(Jinv_f);
-//}
+Array MbSbp::DyT(const Array& f, int block_idx) {
+
+  Array Jinv_f = 0.5*invJ_[block_idx]*f;
+  Array x_eta = x_eta_[block_idx];
+  Array x_xi = x_xi_[block_idx];
+
+  return sbp_[block_idx]->DEtaT(x_xi*Jinv_f) +
+         x_xi*sbp_[block_idx]->DEtaT(Jinv_f) -
+         sbp_[block_idx]->DXiT(x_eta*Jinv_f) -
+         x_eta*sbp_[block_idx]->DXiT(Jinv_f);
+}
 
 
 // This function is used in the constructor

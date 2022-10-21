@@ -7,8 +7,7 @@
 
 /* MbSbp (MbSbp).
  *
- * This class combines MbGrid (MultiblockGrid) and Sbp.
- *
+ * This class combines MbGrid (MultiblockGrid) and Sbp.  *
  * The class takes as input a std::vector<Block>
  * and forms a MultiblockGrid.
  * The class also creates an Sbp-object on each Block
@@ -84,6 +83,7 @@ enum class Direction {x, y};
 
 class MbSbp {
   public:
+
     MbSbp(const std::vector<Block>& blocks, int order);
     ~MbSbp(){};
 
@@ -107,9 +107,9 @@ class MbSbp {
     Array Dx(const MbArray& f, int block_idx);
     Array Dy(const MbArray& f, int block_idx);
 
-    Array DnT(const MbArray& f, int block_idx, Side side);
-    Array DxT(const MbArray& f, int block_idx);
-    Array DyT(const MbArray& f, int block_idx);
+    Array DnT(const Array& f, int block_idx, Side side);
+    Array DxT(const Array& f, int block_idx);
+    Array DyT(const Array& f, int block_idx);
 
     // ------------ MbGrid-functions --------------------
     MbArray Evaluate(std::function<double(double,double)> f);
@@ -127,12 +127,12 @@ class MbSbp {
     Array ToBlockBoundary(const MbArray& f,
                           int block_idx, Side side);
 
-    Array ToBlockBoundary(const Array& f, int block_idx, Side side);
+    Array ToBlockBoundary(const Array& f, int block_idx,
+                          Side side);
 
-   BdSlice GetBdSlice(int block_idx, Side side);
+    BdSlice GetBdSlice(int block_idx, Side side);
 
     bool IsFilppedInterface(int interface_idx);
-
 
   private:
     // ------------------- functions ---------------------------
@@ -179,5 +179,4 @@ class MbSbp {
     std::vector<ArrayPair> ne_;
     std::vector<ArrayPair> ns_;
     std::vector<ArrayPair> nn_;
-
 };
