@@ -23,7 +23,7 @@ struct InsState {
   MbArray u, v, p;
 };
 
-enum class BdType {Wall, Inflow, Outflow, Pressure, SlipWall};
+enum class BdType {Wall, Inflow, Outflow};//, Pressure, SlipWall};
 
 class Ins {
   using Blocks = std::vector<Block>;
@@ -48,18 +48,18 @@ class Ins {
     //                 MbArray& l1, MbArray& l2, MbArray& l3,
     //                 int block_idx, Side side);
 
-    //void InflowSat(double t, const InsState& w,
-    //               MbArray& l1, MbArray& l2, MbArray& l3, 
-    //               int block_idx, Side side, 
-    //               double wn_data, double wt_data);
+    void InflowSat(double t, const InsState& w,
+                   MbArray& l1, MbArray& l2, MbArray& l3,
+                   int block_idx, Side side,
+                   double wn_data, double wt_data);
 
     //void PressureSat(double t, const InsState& w, 
     //                  MbArray& l1, MbArray& l2, MbArray& l3, 
     //                  int block_idx, Side side, double p_data);
 
-    //void OutflowSat(double t, const InsState& w, 
-    //                MbArray& l1, MbArray& l2, MbArray& l3,
-    //                int block_idx, Side side);
+    void OutflowSat(double t, const InsState& w,
+                    MbArray& l1, MbArray& l2, MbArray& l3,
+                    int block_idx, Side side);
 
 // -------------------------------------------------------------
 
@@ -92,18 +92,18 @@ class Ins {
     //                        MbArray& J_l3_f,
     //                        int block_idx, Side side);
 
-    //void JacobianInflowSat(const InsState& f, MbArray& J_l1_f,
-    //                       MbArray& J_l2_f, MbArray& J_l3_f,
-    //                       int block_idx, Side side,
-    //                       double wn_data, double wt_data);
+    void JacobianInflowSat(const InsState& f, MbArray& J_l1_f,
+                           MbArray& J_l2_f, MbArray& J_l3_f,
+                           int block_idx, Side side,
+                           double wn_data, double wt_data);
 
     //void JacobianPressureSat(const InsState& f, MbArray& J_l1_f,
     //                        MbArray& J_l2_f, MbArray& J_l3_f,
     //                        int block_idx, Side side);
 
-    //void JacobianOutflowSat(const InsState& f, MbArray& J_l1_f,
-    //                       MbArray& J_l2_f, MbArray& J_l3_f,
-    //                       int block_idx, Side side);
+    void JacobianOutflowSat(const InsState& f, MbArray& J_l1_f,
+                           MbArray& J_l2_f, MbArray& J_l3_f,
+                           int block_idx, Side side);
 
 
   private:

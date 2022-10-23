@@ -4,23 +4,21 @@
 #include <vector>
 #include "array.hpp"
 #include "mbarray.hpp"
-#include "ins.h"
+#include "ins.hpp"
 
 struct InsSolution {
   double time;
   InsState state;
 };
 
+struct Tspan {
+  double t0, t1;
+};
+
 //--------------------------------------------------------------
 //----------------- Implicit time integration ------------------
 //---------------------------------------------------------------
-InsSolution ImplicitTimeIntegraction(std::vector< double >& tspan,
-                             const InsState& state0, double dt,
-   std::function<InsState(double, const InsState&)> spatial_op,
-   std::function<InsState(double, const InsState&)> Jv);
-
-InsSolution ImplicitTimeIntegractionSaveSolution(
-                    std::vector< double >& tspan,
+InsSolution ImplicitTimeIntegraction(const Tspan& tspan,
                     const InsState& init, double dt,
                     Ins& ins, std::string name_base);
 

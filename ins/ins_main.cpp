@@ -1,10 +1,10 @@
-//============================================================================
+//==================================================================
 // Name        : ins_main.cpp
 // Author      : frela05
 // Description : main-file for the INS equations.
 //               Implicit time integration is used.
 //               This folder "sol" must be created before execution.
-//============================================================================
+//==================================================================
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -18,10 +18,8 @@
 #include "mbsbp.hpp"
 #include "integrate.hpp"
 #include "basics.hpp"
-#include "ins.h"
-#include "integrate_ins.h"
-
-
+#include "ins.hpp"
+#include "integrate_ins.hpp"
 
 InsState InitialData(Ins& ins) {
   auto initu = [] (double x, double y) {
@@ -43,17 +41,18 @@ InsState InitialData(Ins& ins) {
 // Clean up jacobians
 // MKL-operations for Array2D? --
 // try on advection and compare operations
-
 int main() {
 
-  double t0 = 0, t1 = 100, dt = 0.1;
+  double t0 = 0, t1 = 10, dt = 0.2;
 
-  std::vector<double> tspan {t0,t1};
+  Tspan tspan {t0,t1};
   int N = 51;
   auto block {CartesianGrid(N, N)};
   std::vector<Block> blocks {block};
 
   std::vector<BdType> bd_types(4,BdType::Wall);
+  bd_types[3] = BdType::Inflow;
+  bd_types[1] = BdType::Outflow;
 
   int order = 2;
 
@@ -61,7 +60,10 @@ int main() {
   Ins ins {blocks, order, bd_types, mu};
   InsState init = InitialData(ins);
 
-  std::string name_base = "ins_sol/sol";
-  InsSolution sol = ImplicitTimeIntegractionSaveSolution(tspan, init, dt, ins, name_base);
+  auto name_base = "ins_sol/sol";
+
+  InsSolution sol = ImplicitTimeIntegraction(tspan, init, dt, ins,
+                                             name_base);
+
   return 0;
 }
