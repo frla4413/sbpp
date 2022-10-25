@@ -83,8 +83,9 @@ void Print(const Interface& interface) {
 
 void Print(const std::vector<Interface>& interfaces) {
   int interface_idx = 0;
+  std::cout << "\nInterfaces: ";
   for(auto& interface : interfaces) {
-    std::cout << "Interface " << interface_idx << ": ";
+    std::cout << "\nInterface " << interface_idx << ": ";
     Print(interface);
     ++interface_idx;
   }
@@ -109,6 +110,30 @@ bool Equal(const Interface& lhs, const Interface& rhs) {
     same_sides = true;
 
   return (same_blocks && same_sides);
+}
+
+void Print(const BoundaryInfo& boundary) {
+
+  std::string print_me = "(";
+  print_me += std::to_string(boundary.block_idx) + " , ";
+  print_me += SideToString(boundary.side);
+  print_me += ")";
+  std::cout << print_me;
+}
+
+void Print(const std::vector<BoundaryInfo>& boundaries) {
+  int current_block = 0;
+  std::cout << "\nBoundaries:";
+  std::cout << "\nBlock " << current_block << ": ";
+  for(auto& boundary : boundaries) {
+    if(boundary.block_idx > current_block) {
+       std::cout << std::endl;
+       current_block = boundary.block_idx;
+       std::cout << "Block " << current_block << ": ";
+    }
+    Print(boundary);
+    std::cout << " , ";
+  }
 }
 
 MbGrid::MbGrid(const Blocks& blocks) {
@@ -171,9 +196,10 @@ std::vector<std::vector<BlockInterface>>MbGrid::GetBlockInterfaces
   return block_interfaces_;
 };
 
-std::vector<BoundaryInfo> MbGrid::boundaries() {
+const std::vector<BoundaryInfo> MbGrid::boundaries() const {
   return boundaries_;
 };
+
 /* Check if an interface has flipped orientation compared to its neighbour.
  * Ex. an east-to-south interface is flipped.
  *

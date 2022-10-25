@@ -174,20 +174,20 @@ Array MbSbp::Dy(const MbArray& f, int block_idx) {
  */
 Array MbSbp::DnT(const Array& f, int block_idx, Side side) {
   auto bd_slice {GetBdSlice(block_idx, side)};
+  int size = bd_slice.slice.size();
+  auto slice {bd_slice.slice};
   auto normals {GetNormals(block_idx, side)};
   int Nx = shapes(block_idx).Nx;
   int Ny = shapes(block_idx).Ny;
 
   auto nx_f {Array(Nx, Ny)};
-  nx_f[bd_slice.slice] = normals.a1.array()*f[bd_slice.slice];
-
-  auto DxT_nx_f = DxT(nx_f, block_idx);
+  nx_f[slice] = normals.a1.array()*f[slice];
 
   auto ny_f {Array(Nx, Ny)};
-  ny_f[bd_slice.slice] = normals.a2.array()*f[bd_slice.slice];
+  ny_f[slice] = normals.a2.array()*f[slice];
 
-  auto DxTnxf {Array(1,Ny,DxT(nx_f, block_idx)[bd_slice.slice])};
-  auto DyTnyf {Array(1,Ny,DyT(ny_f, block_idx)[bd_slice.slice])};
+  auto DxTnxf {Array(1,size,DxT(nx_f, block_idx)[slice])};
+  auto DyTnyf {Array(1,size,DyT(ny_f, block_idx)[slice])};
   return DxTnxf + DyTnyf;
 }
 

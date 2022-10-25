@@ -96,9 +96,9 @@ void Ins::ApplySat(double t, const InsState& w,
         InflowSat(t, w, l1, l2, l3, 
                   bd.block_idx, bd.side, -1, 0);
         break;
-//      case BdType::Pressure:
-//        PressureSat(t, w, l1, l2, l3, bd.block_idx, bd.side, 0);
-//        break;
+      case BdType::Pressure:
+        PressureSat(t, w, l1, l2, l3, bd.block_idx, bd.side, 0);
+        break;
       case BdType::Outflow:
         OutflowSat(t, w, l1, l2, l3, bd.block_idx, bd.side);
         break;
@@ -122,30 +122,28 @@ void Ins::WallSat(double t, const InsState& w,
   auto lift {Pinv*Pbd};
 
   int size = bd_slice.slice.size();
-  auto u_bd {Array(1,size, w.u[block_idx][bd_slice.slice])};
-  auto v_bd {Array(1,size, w.v[block_idx][bd_slice.slice])};
+  auto slice {bd_slice.slice};
+  auto u_bd {Array(1, size, w.u[block_idx][slice])};
+  auto v_bd {Array(1, size, w.v[block_idx][slice])};
 
   auto wn {nx*u_bd + ny*v_bd};
 
   auto pen {-0.5*lift*u_bd*wn};
-  l1[block_idx][bd_slice.slice] += pen.array();
+  l1[block_idx][slice] += pen.array();
   pen = -0.5*lift*v_bd*wn;
-  l2[block_idx][bd_slice.slice] += pen.array();
+  l2[block_idx][slice] += pen.array();
   pen = -1.0*lift*wn;
-  l3[block_idx][bd_slice.slice] += pen.array();
+  l3[block_idx][slice] += pen.array();
 
   if(mu_ != 0) {
-    int Nx = sbp_->shapes(block_idx).Nx;
-    int Ny = sbp_->shapes(block_idx).Ny;
-    size = Pbd.size();
-    auto u_Pbd {Array(1,size,
-                w.u[block_idx][bd_slice.slice]*Pbd.array())};
+    auto shape {sbp_->shapes(block_idx)};
+    auto u_Pbd {Array(shape.Nx, shape.Ny)};
+    u_Pbd[slice] = w.u[block_idx][slice]*Pbd.array();
     pen = mu_*Pinv*sbp_->DnT(u_Pbd, block_idx, side);
-    l1[block_idx][bd_slice.slice] += pen.array();
+    l1[block_idx][slice] += pen.array();
 
-    auto v_Pbd {Array(1,size,
-                w.v[block_idx][bd_slice.slice]*Pbd.array())};
-
+    auto v_Pbd {Array(shape.Nx, shape.Ny)};
+    v_Pbd[slice] =  w.v[block_idx][slice]*Pbd.array();
     pen = mu_*Pinv*sbp_->DnT(v_Pbd, block_idx, side);
     l2[block_idx][bd_slice.slice] += pen.array();
   }
@@ -265,36 +263,37 @@ void Ins::InflowSat(double t, const InsState& w,
   }
 }
 
-//void Ins::PressureSat(double t, const InsState& w, 
-//                        MbArray& l1, MbArray& l2, MbArray& l3, 
-//                        int block_idx, Side side, double p_data)
-//{
-//
-//   std::pair<Array2D, Array2D> normals = sbp_->GetNormals(block_idx, side);
-//   Array2D nx = normals.first, ny = normals.second;
-//   
-//   auto bd_slice = sbp_->GetBlockBoundarySliceAndSize(block_idx, side);
-//   
-//   Array2D Pinv = sbp_->GetPinvAtBoundary(block_idx, side);
-//   Array2D Pbd = sbp_->GetBoundaryQuadrature(block_idx, side);
-//   Array2D lift = Pinv*Pbd;
-//   
-//   Array2D p_bd = Array2D(1,size, w.p[block_idx][slice]);
-//   
-//   Array2D pen = -1.0*lift*nx*(p_bd - p_data);
-//   l1[block_idx][slice] +=  pen.array();
-//   pen = -1.0*lift*ny*(p_bd-p_data);
-//   l2[block_idx][slice] +=  pen.array();
-//
-//   if(mu_ != 0)
-//   {
-//      pen = mu_*lift*sbp_->Dn(w.u, block_idx, side);
-//      l1[block_idx][slice] += pen.array();
-//
-//      pen = mu_*lift*sbp_->Dn(w.v, block_idx, side);
-//      l2[block_idx][slice] += pen.array();
-//   }
-//}
+void Ins::PressureSat(double t, const InsState& w,
+                      MbArray& l1, MbArray& l2, MbArray& l3,
+                      int block_idx, Side side, double p_data) {
+
+  auto normals {sbp_->GetNormals(block_idx, side)};
+  auto nx {normals.a1}, ny {normals.a2};
+
+  auto bd_slice {sbp_->GetBdSlice(block_idx, side)};
+
+  auto Pinv {sbp_->GetPinvAtBoundary(block_idx, side)};
+  auto Pbd {sbp_->GetBoundaryQuadrature(block_idx, side)};
+
+  int size = bd_slice.slice.size();
+  auto slice {bd_slice.slice};
+  auto lift {Pinv*Pbd};
+
+  auto p_bd {Array(1,size, w.p[block_idx][slice])};
+
+  auto pen {-1.0*lift*nx*(p_bd - p_data)};
+  l1[block_idx][slice] +=  pen.array();
+  pen = -1.0*lift*ny*(p_bd-p_data);
+  l2[block_idx][slice] +=  pen.array();
+
+  if(mu_ != 0) {
+    pen = mu_*lift*sbp_->Dn(w.u, block_idx, side);
+    l1[block_idx][slice] += pen.array();
+
+    pen = mu_*lift*sbp_->Dn(w.v, block_idx, side);
+    l2[block_idx][slice] += pen.array();
+  }
+}
 
 void Ins::OutflowSat(double t, const InsState& w,
                     MbArray& l1, MbArray& l2, MbArray& l3,
@@ -509,7 +508,7 @@ void Ins::ExportToTec(const InsState& state,
 //   outfile.close();
 //}
 
-//---------------------------------- Jacobian ---------------------------------------
+//---------------------- Jacobian -------------------------------
 /*
  *  Jacobian for L(w) + S(w).
  *  The SAT-term is evaluated for g = 0 (no data).
@@ -547,8 +546,8 @@ valarray Ins::Jacobian(const InsState& f) {
   if (mu_ != 0) {
     J_l1_f -= mu_*(sbp_->DxAndInterface(dfudx) +
                    sbp_->DyAndInterface(dfudy));
-     J_l2_f -= mu_*(sbp_->DxAndInterface(dfvdx) +
-                    sbp_->DyAndInterface(dfvdy));
+    J_l2_f -= mu_*(sbp_->DxAndInterface(dfvdx) +
+                   sbp_->DyAndInterface(dfvdy));
   }
   JacobianSat(f, J_l1_f, J_l2_f, J_l3_f);
   return MbArraysToValArray(J_l1_f, J_l2_f, J_l3_f);
@@ -572,10 +571,10 @@ void Ins::JacobianSat(const InsState& f,  MbArray& J_l1_f,
         JacobianInflowSat(f, J_l1_f, J_l2_f, J_l3_f,
                           bd.block_idx, bd.side, -1, 0);
         break;
-    //   case BdType::Pressure:
-    //         JacobianPressureSat(f, J_l1_f, J_l2_f, J_l3_f,
-    //                             bd.block_idx, bd.side);
-    //         break;
+      case BdType::Pressure:
+        JacobianPressureSat(f, J_l1_f, J_l2_f, J_l3_f,
+                            bd.block_idx, bd.side);
+        break;
       case BdType::Outflow:
        JacobianOutflowSat(f, J_l1_f, J_l2_f, J_l3_f,
                           bd.block_idx, bd.side);
@@ -600,12 +599,10 @@ void Ins::JacobianWallSat(const InsState& f, MbArray& J_l1_f,
 
   int size = bd_slice.slice.size();
   auto slice {bd_slice.slice};
-  auto wu_bd {Array(1,size,
-              state_.u[block_idx][slice])};
-  auto wv_bd {Array(1,size,
-                       state_.v[block_idx][bd_slice.slice])};
+  auto wu_bd {Array(1, size, state_.u[block_idx][slice])};
+  auto wv_bd {Array(1, size, state_.v[block_idx][slice])};
 
-  auto wwn = nx*wu_bd + ny*wv_bd;
+  auto wwn {nx*wu_bd + ny*wv_bd};
   auto fu_bd {Array(1,size, f.u[block_idx][slice])};
   auto fv_bd {Array(1,size, f.v[block_idx][slice])};
 
@@ -620,14 +617,15 @@ void Ins::JacobianWallSat(const InsState& f, MbArray& J_l1_f,
   J_l3_f[block_idx][slice] +=  pen.array();
 
   if(mu_ != 0) {
-    auto u_Pbd = f.u;
-    u_Pbd[block_idx][slice] *= Pbd.array();
-    pen = mu_*Pinv*sbp_->DnT(u_Pbd[block_idx], block_idx, side);
+    auto shape {sbp_->shapes(block_idx)};
+    auto u_Pbd {Array(shape.Nx, shape.Ny)};
+    u_Pbd[slice] = f.u[block_idx][slice]*Pbd.array();
+    pen = mu_*Pinv*sbp_->DnT(u_Pbd, block_idx, side);
     J_l1_f[block_idx][slice] += pen.array();
 
-    auto v_Pbd = f.v;
-    v_Pbd[block_idx][slice] *= Pbd.array();
-    pen = mu_*Pinv*sbp_->DnT(v_Pbd[block_idx], block_idx, side);
+    auto v_Pbd {Array(shape.Nx, shape.Ny)};
+    v_Pbd[slice] = f.v[block_idx][slice]*Pbd.array();
+    pen = mu_*Pinv*sbp_->DnT(v_Pbd, block_idx, side);
     J_l2_f[block_idx][slice] += pen.array();
   }
 }
@@ -755,36 +753,38 @@ void Ins::JacobianInflowSat(const InsState& f, MbArray& J_l1_f,
    }
 }
 
-//void Ins::JacobianPressureSat(const InsState& f, MbArray& J_l1_f, 
-//      MbArray& J_l2_f, MbArray& J_l3_f, int block_idx, Side side)
-//{
-//
-//   std::pair<Array2D,Array2D> normals = sbp_->GetNormals(block_idx, side);
-//   Array2D nx = normals.first, ny = normals.second;
-//
-//   auto bd_slice = sbp_->GetBlockBoundarySliceAndSize(block_idx, side);
-//
-//   Array2D Pinv = sbp_->GetPinvAtBoundary(block_idx, side);
-//   Array2D Pbd = sbp_->GetBoundaryQuadrature(block_idx, side);
-//   Array2D lift = Pinv*Pbd;
-//
-//   Array2D fp_bd = Array2D(1,size, f.p[block_idx][slice]);
-//
-//   Array2D pen = -1.0*lift*nx*fp_bd;
-//   J_l1_f[block_idx][slice] +=  pen.array();
-//
-//   pen = -1.0*lift*ny*fp_bd;
-//   J_l2_f[block_idx][slice] +=  pen.array();
-//   if(mu_ != 0)
-//   {
-//      pen = mu_*lift*sbp_->Dn(f.u, block_idx, side);
-//      J_l1_f[block_idx][slice] += pen.array();
-//
-//      pen = mu_*lift*sbp_->Dn(f.v, block_idx, side);
-//      J_l2_f[block_idx][slice] += pen.array();
-//   }
-//}
-//
+void Ins::JacobianPressureSat(const InsState& f,
+             MbArray& J_l1_f, MbArray& J_l2_f, MbArray& J_l3_f,
+             int block_idx, Side side) {
+
+  auto normals {sbp_->GetNormals(block_idx, side)};
+  auto nx {normals.a1}, ny {normals.a2};
+
+  auto bd_slice {sbp_->GetBdSlice(block_idx, side)};
+
+  auto Pinv {sbp_->GetPinvAtBoundary(block_idx, side)};
+  auto Pbd {sbp_->GetBoundaryQuadrature(block_idx, side)};
+  auto lift {Pinv*Pbd};
+
+  int size = bd_slice.slice.size();
+  auto slice {bd_slice.slice};
+
+  auto fp_bd {Array(1, size, f.p[block_idx][slice])};
+
+  auto pen {-1.0*lift*nx*fp_bd};
+  J_l1_f[block_idx][slice] +=  pen.array();
+
+  pen = -1.0*lift*ny*fp_bd;
+  J_l2_f[block_idx][slice] +=  pen.array();
+  if(mu_ != 0) {
+    pen = mu_*lift*sbp_->Dn(f.u, block_idx, side);
+    J_l1_f[block_idx][slice] += pen.array();
+
+    pen = mu_*lift*sbp_->Dn(f.v, block_idx, side);
+    J_l2_f[block_idx][slice] += pen.array();
+  }
+}
+
 void Ins::JacobianOutflowSat(const InsState& f, MbArray& J_l1_f,
       MbArray& J_l2_f, MbArray& J_l3_f,
       int block_idx, Side side) {

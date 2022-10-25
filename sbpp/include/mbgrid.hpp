@@ -169,6 +169,16 @@ struct BoundaryInfo {
 };
 
 /*
+ * Print an interface to the terminal.
+ */
+void Print(const BoundaryInfo& boundary);
+
+/*
+ * Print an interface to the terminal.
+ */
+void Print(const std::vector<BoundaryInfo>& boundaries);
+
+/*
  * A pair of Arrays.
  */
 struct ArrayPair {
@@ -211,7 +221,7 @@ class MbGrid {
     ArrayPair GetNormals(int block_idx, Side side);
     const std::vector<Interface>& interfaces() const;
     std::vector<std::vector<BlockInterface>> GetBlockInterfaces();
-    std::vector<BoundaryInfo> boundaries();
+    const std::vector<BoundaryInfo> boundaries() const;
     Block GetBoundary(int block_idx, Side);
 
     bool IsInterface(int block_idx, Side side);

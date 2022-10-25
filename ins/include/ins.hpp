@@ -23,7 +23,7 @@ struct InsState {
   MbArray u, v, p;
 };
 
-enum class BdType {Wall, Inflow, Outflow};//, Pressure, SlipWall};
+enum class BdType {Wall, Inflow, Outflow, Pressure};//, SlipWall};
 
 class Ins {
   using Blocks = std::vector<Block>;
@@ -53,9 +53,9 @@ class Ins {
                    int block_idx, Side side,
                    double wn_data, double wt_data);
 
-    //void PressureSat(double t, const InsState& w, 
-    //                  MbArray& l1, MbArray& l2, MbArray& l3, 
-    //                  int block_idx, Side side, double p_data);
+    void PressureSat(double t, const InsState& w,
+                     MbArray& l1, MbArray& l2, MbArray& l3,
+                     int block_idx, Side side, double p_data);
 
     void OutflowSat(double t, const InsState& w,
                     MbArray& l1, MbArray& l2, MbArray& l3,
@@ -97,14 +97,13 @@ class Ins {
                            int block_idx, Side side,
                            double wn_data, double wt_data);
 
-    //void JacobianPressureSat(const InsState& f, MbArray& J_l1_f,
-    //                        MbArray& J_l2_f, MbArray& J_l3_f,
-    //                        int block_idx, Side side);
+    void JacobianPressureSat(const InsState& f, MbArray& J_l1_f,
+                             MbArray& J_l2_f, MbArray& J_l3_f,
+                             int block_idx, Side side);
 
     void JacobianOutflowSat(const InsState& f, MbArray& J_l1_f,
                            MbArray& J_l2_f, MbArray& J_l3_f,
                            int block_idx, Side side);
-
 
   private:
    double mu_ = 0; // diffusion coefficient

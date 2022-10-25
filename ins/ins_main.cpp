@@ -43,20 +43,17 @@ InsState InitialData(Ins& ins) {
 // try on advection and compare operations
 int main() {
 
-  double t0 = 0, t1 = 10, dt = 0.2;
+  double t0 = 0, t1 = 10, dt = 0.05;
 
   Tspan tspan {t0,t1};
   int N = 51;
   auto block {CartesianGrid(N, N)};
   std::vector<Block> blocks {block};
-
   std::vector<BdType> bd_types(4,BdType::Wall);
-  bd_types[3] = BdType::Inflow;
-  bd_types[1] = BdType::Outflow;
 
-  int order = 2;
+  int order = 4;
 
-  double mu = 0;
+  double mu = 0.1;
   Ins ins {blocks, order, bd_types, mu};
   InsState init = InitialData(ins);
 
@@ -64,6 +61,5 @@ int main() {
 
   InsSolution sol = ImplicitTimeIntegraction(tspan, init, dt, ins,
                                              name_base);
-
   return 0;
 }

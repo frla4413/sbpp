@@ -168,6 +168,7 @@ InsState InsBdf1Step(const InsState& prev_state,
 
     b = F(t,new_state);
     linf_err = abs(b).max();
+    std::cout << linf_err << "\n";
     if(linf_err < tol){ break; }
   }
   if (linf_err > tol) {
