@@ -10,7 +10,7 @@
 //----------------------------------------------------------------
 /*
  * Implicit integration.
- * Integrates state' + spatial_op(t,state) = 
+ * Integrates state' + spatial_op(t,state) = 0
  * from tspan[0] to tspan[1].
  * Input:
  *  o tspan[t0, t1] - limits of the integration
@@ -40,7 +40,7 @@ InsSolution ImplicitTimeIntegraction(const Tspan& tspan,
   double t = tspan.t0;
 
   int tec_pos = 0;
-  double tol = 1e-12;
+  double tol = 1e-6;
   for(int i : tq::trange(NoS)) {
     if(i % interval == 0) {
       std::string file_name = name_base + std::to_string(tec_pos);
@@ -61,69 +61,61 @@ InsSolution ImplicitTimeIntegraction(const Tspan& tspan,
   return {t,state};;
 }
 
-//InsSolution SolveSteadyState(const InsState& init,
-//                             Ins& ins, std::string name_base) {
-//
-//  InsState new_state = init, prev_state = init, prev_prev_state = init;
-//
-//  int tec_pos = 0;
-//  double tol = 1e-9;
-//  int N = init.u.GetTotalSize();
-//  double t = 0;
-//
-//  auto F = [&ins](double t, const InsState& state)
-//  {
-//     return ins.SpatialOperator(t,state);
-//  };
-//
-//  auto J_Fv = [&ins](const InsState& state)
-//  {
-//     return ins.Jacobian(state);
-//  };
-//
-//
-//  std::valarray<double> delta;
-//  std::valarray<double> b = F(t,new_state);
-//  double linf_err = abs(b).max();
-//  for(int k = 0; k < 25; k++)
-//  {
-//     prev_state = new_state;
-//
-//     std::string file_name = name_base + std::to_string(k);
-//     ins.ExportToTec(new_state,file_name);
-//
-//     //auto J_Fv = [&ins,&b,&F,prev_state](const InsState& state)
-//     //{
-//     //   double mu = 1e-5;
-//     //   DataTypes::InsState tmp = state;
-//     //   tmp.u = tmp.u*mu + state.u;
-//     //   tmp.v = tmp.v*mu + state.v;
-//     //   tmp.p = tmp.p*mu + state.p;
-//     //   return (F(0,tmp) - b)/mu;
-//     //};
-//
-//     delta = InsGmresMkl(J_Fv, b, new_state, ins);
-//
-//     new_state.u -= MbArray(delta[std::slice(0,N,1)], 
-//                                 new_state.u.GetShapes());
-//
-//     new_state.v -= MbArray(delta[std::slice(N,N,1)], 
-//                                 new_state.u.GetShapes());
-//     new_state.p -= MbArray(delta[std::slice(2*N,N,1)], 
-//                                 new_state.u.GetShapes());
-//     b = F(t,new_state);
-//     linf_err = abs(b).max();
-//     std::cout << "err: " << linf_err << std::endl;
-//     if(linf_err < tol){ break; }
-//  }
-//  if (linf_err > tol) {std::cout << "BDF1: GMRES NOT CONVERGED, L_inf err"
-//                    << linf_err << std::endl;}
-//
-//  DataTypes::InsSolution solution;
-//  solution.state = new_state;
-//  return solution;
-//}
+InsSolution SolveSteadyState(const InsState& init,
+                             Ins& ins, std::string name_base) {
 
+  InsState new_state = init, prev_state = init;
+
+  int tec_pos = 0;
+  double tol = 1e-9;
+  int N = init.u.GetTotalSize();
+  double t = 0;
+
+  auto F = [&ins](double t, const InsState& state) {
+    return ins.SpatialOperator(t,state);
+  };
+
+  auto J_Fv = [&ins](const InsState& state) {
+    return ins.Jacobian(state);
+  };
+
+  std::valarray<double> delta;
+  std::valarray<double> b = F(t,new_state);
+  double linf_err = abs(b).max();
+  for(int k = 0; k < 25; ++k) {
+    prev_state = new_state;
+
+    std::string file_name = name_base + std::to_string(k);
+    ins.ExportToTec(new_state,file_name);
+
+    //auto J_Fv = [&ins,&b,&F,prev_state](const InsState& state)
+    //{
+    //   double mu = 1e-5;
+    //   DataTypes::InsState tmp = state;
+    //   tmp.u = tmp.u*mu + state.u;
+    //   tmp.v = tmp.v*mu + state.v;
+    //   tmp.p = tmp.p*mu + state.p;
+    //   return (F(0,tmp) - b)/mu;
+    //};
+
+    delta = InsGmresMkl(J_Fv, b, new_state, ins);
+
+    auto shapes {new_state.u.shapes()};
+    new_state.u -= MbArray(shapes,delta[std::slice(0,N,1)]);
+    new_state.v -= MbArray(shapes,delta[std::slice(N,N,1)]);
+    new_state.p -= MbArray(shapes, delta[std::slice(2*N,N,1)]);
+
+    b = F(t,new_state);
+    linf_err = abs(b).max();
+    std::cout << "err: " << linf_err << std::endl;
+    if(linf_err < tol) { break; }
+  }
+  if (linf_err > tol) {
+    std::cout << "BDF1: GMRES NOT CONVERGED, L_inf err"
+                    << linf_err << std::endl;
+  }
+  return {1.0,new_state};
+}
 
 InsState InsBdf1Step(const InsState& prev_state,
                      double dt, double t, Ins& ins, double tol) {
@@ -217,7 +209,6 @@ InsState InsBdf2Step(const InsState& prev_prev_state,
     delta = InsGmresMkl(J_Fv, b, new_state, ins);
 
     new_state.u -= MbArray(shapes,delta[std::slice(0,N,1)]);
-
     new_state.v -= MbArray(shapes,delta[std::slice(N,N,1)]);
     new_state.p -= MbArray(shapes, delta[std::slice(2*N,N,1)]);
 

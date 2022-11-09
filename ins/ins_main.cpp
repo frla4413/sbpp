@@ -46,14 +46,16 @@ int main() {
   double t0 = 0, t1 = 10, dt = 0.05;
 
   Tspan tspan {t0,t1};
-  int N = 51;
+  int N = 61;
   auto block {CartesianGrid(N, N)};
   std::vector<Block> blocks {block};
-  std::vector<BdType> bd_types(4,BdType::Wall);
+  block.x = block.x + 1;
+  blocks.push_back(block);
+  std::vector<BdType> bd_types(6,BdType::Wall);
 
   int order = 4;
 
-  double mu = 0.1;
+  double mu = 0.01;
   Ins ins {blocks, order, bd_types, mu};
   InsState init = InitialData(ins);
 

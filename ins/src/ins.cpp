@@ -28,7 +28,6 @@ Ins::Ins(const Blocks& blocks, int order,
   mu_ = mu;
 }
 
-
 MbArray Ins::Evaluate(std::function<double(double,double)> f) {
 
   return sbp_->Evaluate(f);
@@ -234,8 +233,6 @@ void Ins::InflowSat(double t, const InsState& w,
   auto ybd {sbp_->ToBlockBoundary(sbp_->blocks(block_idx).y,
                                    block_idx,side)};
 
-  //Array2D u_data = Array2D(1,ybd.Size(),-1 + std::tanh(20*(ybd.array()+1))
-  //                                         - std::tanh(20*(ybd.array()-1)));
   auto u_data {nx*wn_data - ny*wt_data};
 
   auto pen {-1.0*lift*wn*(u_bd - u_data)};

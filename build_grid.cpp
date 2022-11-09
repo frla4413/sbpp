@@ -15,9 +15,6 @@
 #include "mesh.hpp"
 #include "mbgrid.hpp"
 #include "mbsbp.hpp"
-#include "advection.hpp"
-#include "integrate.hpp"
-#include "basics.hpp"
 
 
 int main() {
@@ -32,6 +29,6 @@ int main() {
 
   MbArray f{grid.Evaluate(initu)};
   ExportToTec(grid, f, "annulus_grid");
+  std::cout << "Total size " << f.GetTotalSize() << "\n";
   return 0;
-
 }
