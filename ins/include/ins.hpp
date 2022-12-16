@@ -116,6 +116,11 @@ class Ins {
    MbArray dudx_, dudy_, dvdx_, dvdy_;
 };
 
-void ExportYSlice(const InsState& w,
-                  MbSbp* sbp,
-                  const std::string name, int block_idx, int idx);
+/*
+ * Set initial data. Edit in the cpp file
+ */
+InsState InitialData(Ins& ins);
+
+/*
+ *
+ */

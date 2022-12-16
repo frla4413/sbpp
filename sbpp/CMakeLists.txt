@@ -27,6 +27,6 @@ target_include_directories(sbpp PUBLIC "-DMKL_ILP64 -m64 -I"
                                        ${TQDM_DIR}
                                        include)
 
-target_link_libraries(sbpp PUBLIC "-Wl,--start-group" 
-                                  ${MKL_LIBRARIES} 
-                                  "-Wl,--end-group -lgomp -lpthread -lm -ldl")
+target_link_libraries(sbpp PUBLIC "-Wl,--start-group"
+                                  ${MKL_LIBRARIES}
+               "-Wl,--end-group -lgomp -lpthread -lm -ldl")

@@ -79,23 +79,24 @@ Array MbSbp::GetBoundaryQuadrature(int block_idx, Side side) {
 
 MbArray MbSbp::Dx(const MbArray& f) {
 
-   std::vector<Array> df_dx(num_blocks());
-   for (int i = 0; i < num_blocks(); ++i) {
-     Array temp = y_eta_[i]*f[i];
-     Array df = y_eta_[i]*sbp_[i]->DXi(f[i]) +
-                sbp_[i]->DXi(temp);
-     temp = y_xi_[i]*f[i];
-     df = df - y_xi_[i]*sbp_[i]->DEta(f[i]) -
-               sbp_[i]->DEta(temp);
-     df_dx[i] = 0.5*invJ_[i]*df;
-   }
-   return {df_dx};
+  std::vector<Array> df_dx(num_blocks());
+#pragma omp parallel for
+  for (int i = 0; i < num_blocks(); ++i) {
+    Array temp = y_eta_[i]*f[i];
+    Array df = y_eta_[i]*sbp_[i]->DXi(f[i]) +
+               sbp_[i]->DXi(temp);
+    temp = y_xi_[i]*f[i];
+    df = df - y_xi_[i]*sbp_[i]->DEta(f[i]) -
+              sbp_[i]->DEta(temp);
+    df_dx[i] = 0.5*invJ_[i]*df;
+  }
+  return {df_dx};
 }
 
 MbArray MbSbp::Dy(const MbArray& f) {
 
    std::vector<Array> df_dy(num_blocks());;
-
+#pragma omp parallel for
    for (int i = 0; i < num_blocks(); ++i) {
      Array temp = x_xi_[i]*f[i];
      Array df = x_xi_[i]*sbp_[i]->DEta(f[i]) +

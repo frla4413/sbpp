@@ -1,0 +1,28 @@
+//============================================================
+// Name        : .hpp
+// Date        :
+// Author      : Fredrik Laurén
+// Description : hpp file for the class
+//============================================================
+/*
+ *  Description
+ *
+ * Member functions:
+ *  o
+ *
+ * Member variables:
+ *  o
+ *
+ * Operator functions:
+ *  o
+ *
+ * Non-member functions:
+ *  o
+ *
+ * Comments:
+ *  o
+ *
+ * Other data structes defined here:
+ *  o
+*/
+

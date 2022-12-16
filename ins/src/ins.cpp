@@ -840,3 +840,19 @@ void Ins::JacobianOutflowSat(const InsState& f, MbArray& J_l1_f,
     J_l2_f[block_idx][slice] += pen.array();
   }
 }
+
+InsState InitialData(Ins& ins) {
+  auto initu = [] (double x, double y) {
+     return 1.0 + 0.1*exp(-pow((x - 0.5)/0.1,2))*
+                      exp(-pow((y - 0.5)/0.1,2));
+  };
+  InsState init;
+  init.u = ins.Evaluate(initu);
+  double normalize = abs(init.u.ToValarray()).max();
+  init.u = init.u/normalize;
+  auto initv = [] (double x, double y) { return 0; };
+  init.v = ins.Evaluate(initv);
+  auto initp = [] (double x, double y) { return 0; };
+  init.p = ins.Evaluate(initp);
+  return init;
+}

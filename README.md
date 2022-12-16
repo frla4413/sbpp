@@ -1,6 +1,17 @@
 This is a set of c++ functions that can be used to solve an intiial-boundary value problem.
 
-The numerical scheme is based uses finite-difference operators on summation-by-parts form.
+The numerical scheme uses finite-difference operators on summation-by-parts form. Details are found in my PhD-thesis
+http://www.diva-portal.org/smash/record.jsf?pid=diva2%3A1614643&dswid=1629 and references therin.
+
+Below is the popular benchmark: The lid-driven cavity. The lower, loeft and rigth boundaries are solid walls. At the upper boundary, we have imposed (u,v) = (0,1). The diffusion coefficient is 0.001.
+![](https://github.com/frla4413/sbpp/blob/main/images/cavity.png)
+
+Another example is shown below. The most west boundary is an inflow, while the top-right one is set to be the outflow. The remaining side are walls. The diffusion coefficient is set to 0.001.
+
+A final example is whon below, where the flow is coming from the left to the right. The obstacle in its way is forcing the fluid to go around the sqare, which produces the vertices.
+![](https://github.com/frla4413/sbpp/blob/main/gifs/vorticity_video.gif)
+
+The scripts ins/ins_main.cpp shows the typical solution process for the 2D incompressible Navier-Stokes equations.
 
 Requirements:
 * compiler c++17
@@ -14,13 +25,6 @@ To build:
 2. cmake ..
 3. make
 
-Overview of the solution process:
-1. Specify the geometry - Ex. blocks = Annulus()
-2. Form an advection object (boundary conditions are already determined) - advection = (blocks, order)
-3. Set initial condition - init  = init_func()
-4. Integrate in time - sol = Integration([t0 t1], init, dt, rhs_fun)
+A more simple setup is found in the advection folder. See advection/main_explicit.cpp for a setup of the advection equation on an annulus. The solution is shown below.
 
-See advection/main**.cpp for more details.
-
-Below is the solution of the advection equation (with a forcing function) posed on an annulus. A course version of the grid is illustrated as well as the block edges.
-![](https://github.com/frla4413/sbpp/blob/main/annulus.gif)
+![](https://github.com/frla4413/sbpp/blob/main/gifs/annulus.gif)

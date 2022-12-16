@@ -40,7 +40,7 @@ InsSolution ImplicitTimeIntegraction(const Tspan& tspan,
   double t = tspan.t0;
 
   int tec_pos = 0;
-  double tol = 1e-6;
+  double tol = 1e-2;
   for(int i : tq::trange(NoS)) {
     if(i % interval == 0) {
       std::string file_name = name_base + std::to_string(tec_pos);
@@ -280,24 +280,24 @@ GMRES: {
           &ipar[0], &dpar[0], &tmp[0]);
 
     switch (RCI_request) {
-       case 0: {
-         goto COMPLETE;
-       }
-       case 1: {
-         auto shapes = cur_state.u.shapes();
-         int start = ipar[21]-1;
-         InsState state =
-           ins.ValArrayToInsState(tmp[std::slice(start,N,1)]);
-         start = ipar[22]-1;
-         tmp[std::slice(start,N,1)] = Jv(state);
-         goto GMRES;
-       }
-       case 4: {
-         if(dpar[6] < 1e-12)
-           goto COMPLETE;
-         else
-           goto GMRES;
-       }
+      case 0: {
+        goto COMPLETE;
+      }
+      case 1: {
+        auto shapes = cur_state.u.shapes();
+        int start = ipar[21]-1;
+        InsState state =
+          ins.ValArrayToInsState(tmp[std::slice(start,N,1)]);
+        start = ipar[22]-1;
+        tmp[std::slice(start,N,1)] = Jv(state);
+        goto GMRES;
+      }
+      case 4: {
+        if(dpar[6] < 1e-12)
+          goto COMPLETE;
+        else
+          goto GMRES;
+      }
     }
   }
 
