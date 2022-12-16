@@ -22,8 +22,6 @@
 #include "integrate_ins.hpp"
 #include "ins_setup.hpp"
 
-// TO DO:
-// InsState
 int main() {
 
 //=============== User input ======================================

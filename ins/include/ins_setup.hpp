@@ -1,3 +1,13 @@
+//==================================================================
+// Name        : ins_setp.hpp
+// Author      : Fredrik Laurén
+// Description : Setup file for ins_main.cpp. Build the grid and
+//               specify boundary conditions.
+//               The file build_tests/grid.cpp can be used 
+//               when building the grid.
+//==================================================================
+
+
 #include "ins.hpp"
 #include "mesh.hpp"
 #include <algorithm>
@@ -142,6 +152,10 @@ InsSetup GetObstacleGrid(int N) {
  return {blocks, bd_types};
 }
 
+/*
+ * A functiont that stretches the coordinates so that more 
+ * points are located at the boundaries.
+ */
 Array StretchCoordinates(const Array& x) {
 
   auto f = x.array();
@@ -153,6 +167,9 @@ Array StretchCoordinates(const Array& x) {
   return {Array(x.Nx(), x.Ny(), f)};
 }
 
+/*
+ * A channel that consists of four blocks.
+ */
 InsSetup Channel(int N) {
 
   auto block {CartesianGrid(N, N)};
