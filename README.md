@@ -10,7 +10,7 @@ At the upper boundary, (u,v) = (0,1).
 ![](https://github.com/frla4413/sbpp/blob/main/images/cavity.png)
 
 Another example is shown below. The west boundary is an inflow, while the top-right one is set to be the outflow. The remaining side are walls.
-![](https://github.com/frla4413/sbpp/blob/main/gif/channel.gif)
+![](https://github.com/frla4413/sbpp/blob/main/gifs/channel.gif)
 
 A final example is shown below, where the flow is coming from the left to the right. The obstacle interferes with the fluid, leading to vertices.
 ![](https://github.com/frla4413/sbpp/blob/main/gifs/vorticity.gif)
