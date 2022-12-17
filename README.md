@@ -1,6 +1,6 @@
-A collection of c++ functions that can be used to solve intiial-boundary value problems.
+A collection of c++ functions that can be used to solve initial-boundary value problems.
 
-The numerical scheme uses difference operators on summation-by-parts form. Details are found in my PhD-thesis
+The numerical schemes use difference operators on summation-by-parts form. Details are found in my PhD-thesis
 http://www.diva-portal.org/smash/record.jsf?pid=diva2%3A1614643&dswid=1629 and references therein.
 
 The script ins/ins_main.cpp shows the typical solution process for the 2D incompressible Navier-Stokes equations.
@@ -15,6 +15,10 @@ Another example is shown below. The west side is the inflow boundary, while the 
 A final example is shown below, where the flow is coming from the left to the right. The obstacle interferes with the fluid, leading to vertices.
 ![](https://github.com/frla4413/sbpp/blob/main/gifs/vorticity.gif)
 
+A simpler setup is found in the advection folder. See advection/main_explicit.cpp for a setup of the advection equation on an annulus, shown below.
+
+![](https://github.com/frla4413/sbpp/blob/main/gifs/annulus.gif)
+
 Requirements:
 * compiler c++17
 * cmake
@@ -27,6 +31,4 @@ Build:
 2. cmake ..
 3. make
 
-A simpler setup is found in the advection folder. See advection/main_explicit.cpp for a setup of the advection equation on an annulus, shown below.
 
-![](https://github.com/frla4413/sbpp/blob/main/gifs/annulus.gif)
