@@ -12,7 +12,7 @@ At the upper boundary, (u,v) = (0,1).
 Another example is shown below. The west side is the inflow boundary, while the top-right one is set to an outflow boundary. The remaining side are walls.
 ![](https://github.com/frla4413/sbpp/blob/main/gifs/channel.gif)
 
-A final example is shown below, where the flow is coming from the left to the right. The obstacle interferes with the fluid, leading to vertices.
+A final example is shown below, where an obstacle interferes with the fluid, leading to vertices.
 ![](https://github.com/frla4413/sbpp/blob/main/gifs/vorticity.gif)
 
 A simpler setup is found in the advection folder. See advection/main_explicit.cpp for a setup of the advection equation on an annulus, shown below.
